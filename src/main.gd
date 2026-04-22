@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var select_sort_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectSortOption
 @onready var sort_visualization_area: HBoxContainer = $MarginContainer/VBoxContainer/SortVisualizationArea
+@onready var status_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StatusLabel
 
 const MAX_SIZE: int = 100
 const MARGIN_SIZE: int = 6
@@ -50,8 +51,30 @@ func _ready() -> void:
 
 func _on_shuffle_button_pressed() -> void:
 	sort_values.shuffle()
-	for i in range(MAX_SIZE):
-		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
+	redraw_visualization_area()
 
 func _on_run_sort_button_pressed() -> void:
-	pass # Replace with function body.
+	status_label.text = "Running..."
+	match select_sort_option.text:
+		"Bubble Sort":
+			bubble_sort()
+		"Merge Sort":
+			merge_sort()
+
+func bubble_sort() -> void:
+	for i in sort_values.size() - 1:
+		for j in range(0, sort_values.size() - i - 1):
+			if sort_values[j] > sort_values[j + 1]:
+				var temp: int = sort_values[j]
+				sort_values[j] = sort_values[j + 1]
+				sort_values[j + 1] = temp
+				redraw_visualization_area()
+			await get_tree().create_timer(0.01).timeout
+	status_label.text = "Done"
+
+func merge_sort() -> void:
+	print("Merge Sort")
+
+func redraw_visualization_area() -> void:
+	for i in range(MAX_SIZE):
+		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])

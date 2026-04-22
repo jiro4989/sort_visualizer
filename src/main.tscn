@@ -37,6 +37,10 @@ popup/item_1/id = 1
 layout_mode = 2
 text = "Run Sort"
 
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1022156937]
+layout_mode = 2
+text = "Waiting..."
+
 [node name="SortVisualizationArea" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=263280689]
 layout_mode = 2
 theme_override_constants/separation = 0
