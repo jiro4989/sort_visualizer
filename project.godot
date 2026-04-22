@@ -11,6 +11,8 @@ config_version=5
 [application]
 
 config/name="Sort Visualizer"
+config/description="ソートアルゴリズムの動作を可視化するツール。Godot の練習で作ったツールなので、あまり厳密に実装していません。"
+config/version="0.1.0"
 run/main_scene="uid://ctftnv5dts0ai"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
