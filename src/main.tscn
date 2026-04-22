@@ -22,7 +22,7 @@ theme_override_constants/separation = 6
 
 [node name="ShuffleButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=979694572]
 layout_mode = 2
-text = "Generate"
+text = "Shuffle"
 
 [node name="SelectSortOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=667707412]
 layout_mode = 2
