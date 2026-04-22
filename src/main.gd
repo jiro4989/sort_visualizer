@@ -17,11 +17,21 @@ func _ready() -> void:
 	sort_values.shuffle()
 
 	# Panel を生成して MAX_SIZE 分だけ生成する
-	for i in range(MAX_SIZE):
-		var panel: Panel = Panel.new()
+	for i in sort_values:
 		var width: int = floori(float(VISUALIZATION_AREA_WIDTH) / MAX_SIZE)
-		var height: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE) * (i + 1)
-		panel.custom_minimum_size = Vector2(width, height)
+		var height: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE) * i
+		var column: VBoxContainer = VBoxContainer.new()
+		column.custom_minimum_size = Vector2(width, 0)
+		column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+		# 上側の余白を可変にして、バーを下寄せにする
+		var spacer: Control = Control.new()
+		spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		column.add_child(spacer)
+
+		var panel: Panel = Panel.new()
+		panel.custom_minimum_size = Vector2(0, height)
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		# panel の角を丸めない
 		var style_box := StyleBoxFlat.new()
@@ -31,7 +41,8 @@ func _ready() -> void:
 		style_box.corner_radius_bottom_left = 0
 		panel.add_theme_stylebox_override("panel", style_box)
 
-		sort_visualization_area.add_child(panel)
+		column.add_child(panel)
+		sort_visualization_area.add_child(column)
 
 func _on_shuffle_button_pressed() -> void:
 	sort_values.shuffle()
