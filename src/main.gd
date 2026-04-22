@@ -11,6 +11,8 @@ const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
 const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT - MARGIN_SIZE * 2
 const BAR_WIDTH: int = floori(float(VISUALIZATION_AREA_WIDTH) / MAX_SIZE)
 const BAR_HEIGHT: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE)
+const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
+const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
 var sort_values: Array[int] = []
 var panels: Array[Panel] = []
 
@@ -38,12 +40,7 @@ func _ready() -> void:
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		# panel の角を丸めない
-		var style_box := StyleBoxFlat.new()
-		style_box.corner_radius_top_left = 0
-		style_box.corner_radius_top_right = 0
-		style_box.corner_radius_bottom_right = 0
-		style_box.corner_radius_bottom_left = 0
-		panel.add_theme_stylebox_override("panel", style_box)
+		apply_panel_style(panel, BAR_DEFAULT_COLOR)
 
 		column.add_child(panel)
 		panels.append(panel)
@@ -66,6 +63,8 @@ func bubble_sort() -> void:
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
 			loop_count += 1
+			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
+
 			if sort_values[j] > sort_values[j + 1]:
 				var temp: int = sort_values[j]
 				sort_values[j] = sort_values[j + 1]
@@ -74,6 +73,8 @@ func bubble_sort() -> void:
 
 			status_label.text = create_status_text("Running", start_time, loop_count)
 			await get_tree().create_timer(0.01).timeout
+
+	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻すため、範囲外の数値を渡す
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
 func merge_sort() -> void:
@@ -82,6 +83,20 @@ func merge_sort() -> void:
 func redraw_visualization_area() -> void:
 	for i in range(MAX_SIZE):
 		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
+
+func highlight_panel(selected_index: int) -> void:
+	for i in range(panels.size()):
+		var color: Color = BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR
+		apply_panel_style(panels[i], color)
+
+func apply_panel_style(panel: Panel, color: Color) -> void:
+	var style_box := StyleBoxFlat.new()
+	style_box.bg_color = color
+	style_box.corner_radius_top_left = 0
+	style_box.corner_radius_top_right = 0
+	style_box.corner_radius_bottom_right = 0
+	style_box.corner_radius_bottom_left = 0
+	panel.add_theme_stylebox_override("panel", style_box)
 
 func create_status_text(text: String, start_time: float, loop_count: int) -> String:
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
