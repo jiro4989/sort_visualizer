@@ -168,4 +168,29 @@ func merge_sort() -> void:
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
 func insertion_sort() -> void:
-	pass
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count: int = 0
+
+	for i in range(1, sort_values.size()):
+		var key: int = sort_values[i]
+		var j: int = i - 1
+
+		# key より大きい要素を右へずらす
+		while j >= 0 and sort_values[j] > key:
+			loop_count += 1
+			highlight_panel(j)
+			sort_values[j + 1] = sort_values[j]
+			redraw_visualization_area()
+			status_label.text = create_status_text("Running", start_time, loop_count)
+			await get_tree().create_timer(0.01).timeout
+			j -= 1
+
+		sort_values[j + 1] = key
+		loop_count += 1
+		highlight_panel(j + 1)
+		redraw_visualization_area()
+		status_label.text = create_status_text("Running", start_time, loop_count)
+		await get_tree().create_timer(0.01).timeout
+
+	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
+	status_label.text = create_status_text("Done", start_time, loop_count)
