@@ -72,12 +72,9 @@ func bubble_sort() -> void:
 				sort_values[j + 1] = temp
 				redraw_visualization_area()
 
-			# 経過時間を status_label に設定
-			var elapsed_time: float = Time.get_ticks_msec() - start_time
-			status_label.text = "Running " + str(elapsed_time) + "ms, " + str(loop_count) + " loops"
-
+			status_label.text = create_status_text("Running", start_time, loop_count)
 			await get_tree().create_timer(0.01).timeout
-	status_label.text = "Done in " + str(Time.get_ticks_msec() - start_time) + "ms, " + str(loop_count) + " loops"
+	status_label.text = create_status_text("Done", start_time, loop_count)
 
 func merge_sort() -> void:
 	print("Merge Sort")
@@ -85,3 +82,7 @@ func merge_sort() -> void:
 func redraw_visualization_area() -> void:
 	for i in range(MAX_SIZE):
 		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
+
+func create_status_text(text: String, start_time: float, loop_count: int) -> String:
+	var elapsed_time: float = Time.get_ticks_msec() - start_time
+	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
