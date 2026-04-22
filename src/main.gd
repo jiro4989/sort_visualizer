@@ -54,7 +54,6 @@ func _on_shuffle_button_pressed() -> void:
 	redraw_visualization_area()
 
 func _on_run_sort_button_pressed() -> void:
-	status_label.text = "Running..."
 	match select_sort_option.text:
 		"Bubble Sort":
 			bubble_sort()
@@ -62,15 +61,23 @@ func _on_run_sort_button_pressed() -> void:
 			merge_sort()
 
 func bubble_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count: int = 0
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
+			loop_count += 1
 			if sort_values[j] > sort_values[j + 1]:
 				var temp: int = sort_values[j]
 				sort_values[j] = sort_values[j + 1]
 				sort_values[j + 1] = temp
 				redraw_visualization_area()
+
+			# 経過時間を status_label に設定
+			var elapsed_time: float = Time.get_ticks_msec() - start_time
+			status_label.text = "Running " + str(elapsed_time) + "ms, " + str(loop_count) + " loops"
+
 			await get_tree().create_timer(0.01).timeout
-	status_label.text = "Done"
+	status_label.text = "Done in " + str(Time.get_ticks_msec() - start_time) + "ms, " + str(loop_count) + " loops"
 
 func merge_sort() -> void:
 	print("Merge Sort")
