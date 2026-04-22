@@ -78,7 +78,70 @@ func bubble_sort() -> void:
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
 func merge_sort() -> void:
-	print("Merge Sort")
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count: int = 0
+	var n: int = sort_values.size()
+	var width: int = 1
+
+	while width < n:
+		for left in range(0, n, width * 2):
+			var mid: int = mini(left + width, n)
+			var right: int = mini(left + width * 2, n)
+			if mid >= right:
+				continue
+
+			var left_part: Array[int] = []
+			for i in range(left, mid):
+				left_part.append(sort_values[i])
+
+			var right_part: Array[int] = []
+			for i in range(mid, right):
+				right_part.append(sort_values[i])
+
+			var li: int = 0
+			var ri: int = 0
+			var write_index: int = left
+
+			while li < left_part.size() and ri < right_part.size():
+				loop_count += 1
+				highlight_panel(write_index)
+
+				if left_part[li] <= right_part[ri]:
+					sort_values[write_index] = left_part[li]
+					li += 1
+				else:
+					sort_values[write_index] = right_part[ri]
+					ri += 1
+
+				redraw_visualization_area()
+				status_label.text = create_status_text("Running", start_time, loop_count)
+				await get_tree().create_timer(0.01).timeout
+				write_index += 1
+
+			while li < left_part.size():
+				sort_values[write_index] = left_part[li]
+				li += 1
+				loop_count += 1
+				highlight_panel(write_index)
+				redraw_visualization_area()
+				status_label.text = create_status_text("Running", start_time, loop_count)
+				await get_tree().create_timer(0.01).timeout
+				write_index += 1
+
+			while ri < right_part.size():
+				sort_values[write_index] = right_part[ri]
+				ri += 1
+				loop_count += 1
+				highlight_panel(write_index)
+				redraw_visualization_area()
+				status_label.text = create_status_text("Running", start_time, loop_count)
+				await get_tree().create_timer(0.01).timeout
+				write_index += 1
+
+		width *= 2
+
+	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
+	status_label.text = create_status_text("Done", start_time, loop_count)
 
 func redraw_visualization_area() -> void:
 	for i in range(MAX_SIZE):
