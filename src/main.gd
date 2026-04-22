@@ -56,6 +56,30 @@ func _on_run_sort_button_pressed() -> void:
 			bubble_sort()
 		"Merge Sort":
 			merge_sort()
+		"Insertion Sort":
+			insertion_sort()
+
+func redraw_visualization_area() -> void:
+	for i in range(MAX_SIZE):
+		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
+
+func highlight_panel(selected_index: int) -> void:
+	for i in range(panels.size()):
+		var color: Color = BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR
+		apply_panel_style(panels[i], color)
+
+func apply_panel_style(panel: Panel, color: Color) -> void:
+	var style_box := StyleBoxFlat.new()
+	style_box.bg_color = color
+	style_box.corner_radius_top_left = 0
+	style_box.corner_radius_top_right = 0
+	style_box.corner_radius_bottom_right = 0
+	style_box.corner_radius_bottom_left = 0
+	panel.add_theme_stylebox_override("panel", style_box)
+
+func create_status_text(text: String, start_time: float, loop_count: int) -> String:
+	var elapsed_time: float = Time.get_ticks_msec() - start_time
+	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
 
 func bubble_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
@@ -143,24 +167,5 @@ func merge_sort() -> void:
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
-func redraw_visualization_area() -> void:
-	for i in range(MAX_SIZE):
-		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
-
-func highlight_panel(selected_index: int) -> void:
-	for i in range(panels.size()):
-		var color: Color = BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR
-		apply_panel_style(panels[i], color)
-
-func apply_panel_style(panel: Panel, color: Color) -> void:
-	var style_box := StyleBoxFlat.new()
-	style_box.bg_color = color
-	style_box.corner_radius_top_left = 0
-	style_box.corner_radius_top_right = 0
-	style_box.corner_radius_bottom_right = 0
-	style_box.corner_radius_bottom_left = 0
-	panel.add_theme_stylebox_override("panel", style_box)
-
-func create_status_text(text: String, start_time: float, loop_count: int) -> String:
-	var elapsed_time: float = Time.get_ticks_msec() - start_time
-	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
+func insertion_sort() -> void:
+	pass
