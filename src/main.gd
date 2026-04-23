@@ -1,6 +1,8 @@
 extends Node2D
 
+@onready var shuffle_button: Button = $MarginContainer/VBoxContainer/HBoxContainer/ShuffleButton
 @onready var select_sort_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectSortOption
+@onready var run_sort_button: Button = $MarginContainer/VBoxContainer/HBoxContainer/RunSortButton
 @onready var sort_visualization_area: HBoxContainer = $MarginContainer/VBoxContainer/SortVisualizationArea
 @onready var status_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StatusLabel
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
@@ -103,24 +105,28 @@ func play_sound(selected_index: int) -> void:
 			sound_phase = fmod(sound_phase, TAU)
 
 func _on_run_sort_button_pressed() -> void:
-	sort(select_sort_option.text)
+	shuffle_button.disabled = true
+	run_sort_button.disabled = true
+	await sort(select_sort_option.text)
+	shuffle_button.disabled = false
+	run_sort_button.disabled = false
 
 func sort(sort_type: String) -> void:
 	match sort_type:
 		"Bubble Sort":
-			bubble_sort()
+			await bubble_sort()
 		"Merge Sort":
-			merge_sort()
+			await merge_sort()
 		"Insertion Sort":
-			insertion_sort()
+			await insertion_sort()
 		"Selection Sort":
-			selection_sort()
+			await selection_sort()
 		"Shell Sort":
-			shell_sort()
+			await shell_sort()
 		"Heap Sort":
-			heap_sort()
+			await heap_sort()
 		"Quick Sort":
-			quick_sort()
+			await quick_sort()
 
 ## バブルソートを実行する。
 func bubble_sort() -> void:
