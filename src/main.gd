@@ -66,13 +66,16 @@ func highlight_panel(selected_index: int) -> void:
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 	play_sound(selected_index)
 
+func highlight_off() -> void:
+	highlight_panel(-1)
+
 ## 先頭から順にハイライトして、最後に全てのパネルをデフォルトに戻す。
 ## 主にソート完了後の強調目的で使用する。
 func highlight_all_panels() -> void:
 	for i in range(sort_values.size()):
 		highlight_panel(i)
 		await get_tree().create_timer(SLEEP_TIME).timeout
-	highlight_panel(-1)
+	highlight_off()
 
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, step_count: int) -> String:
@@ -154,7 +157,7 @@ func bubble_sort() -> void:
 			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
 
-	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻すため、範囲外の数値を渡す
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## マージソートを実行する。
@@ -169,7 +172,7 @@ func merge_sort() -> void:
 	if values.size() > 1:
 		await _merge_sort_range(values, 0, values.size() - 1, start_time, loop_count_box)
 
-	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
 
 func _merge_sort_range(values: Array[int], left: int, right: int, start_time: float, loop_count_box: Array[int]) -> void:
@@ -247,7 +250,7 @@ func insertion_sort() -> void:
 		status_label.text = create_status_text("Running", start_time, step_count)
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
-	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## 選択ソートを実行する。
@@ -275,7 +278,7 @@ func selection_sort() -> void:
 		status_label.text = create_status_text("Running", start_time, step_count)
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
-	highlight_panel(-1)
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## シェルソートを実行する。
@@ -305,7 +308,7 @@ func shell_sort() -> void:
 
 		gap = floori(float(gap) / 2.0)
 
-	highlight_panel(-1)
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## ヒープソートを実行する。
@@ -329,7 +332,7 @@ func heap_sort() -> void:
 
 		await _heapify(end_index, 0, start_time, loop_count_box)
 
-	highlight_panel(-1)
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
 
 func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box: Array[int]) -> void:
@@ -373,7 +376,7 @@ func quick_sort() -> void:
 	if sort_values.size() > 1:
 		await _quick_sort_range(0, sort_values.size() - 1, start_time, loop_count_box)
 
-	highlight_panel(-1)
+	highlight_off()
 	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
 
 func _quick_sort_range(low: int, high: int, start_time: float, loop_count_box: Array[int]) -> void:
