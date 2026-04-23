@@ -49,7 +49,7 @@ popup/item_6/id = 6
 layout_mode = 2
 text = "Run Sort"
 
-[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1707829441]
+[node name="SelectVolumeOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1707829441]
 layout_mode = 2
 tooltip_text = "Select volume."
 selected = 0

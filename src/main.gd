@@ -4,6 +4,7 @@ extends Node2D
 @onready var select_sort_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectSortOption
 @onready var run_sort_button: Button = $MarginContainer/VBoxContainer/HBoxContainer/RunSortButton
 @onready var sort_visualization_area: HBoxContainer = $MarginContainer/VBoxContainer/SortVisualizationArea
+@onready var select_volume_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectVolumeOption
 @onready var status_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StatusLabel
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
@@ -82,6 +83,11 @@ func create_status_text(text: String, start_time: float, step_count: int) -> Str
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
 	return "%s %dms, %d step" % [text, elapsed_time, step_count]
 
+func get_selected_volume_scale() -> float:
+	var volume_text: String = select_volume_option.text
+	var volume_percent: float = clampf(volume_text.to_float(), 0.0, 100.0)
+	return volume_percent / 100.0
+
 ## 指定したインデックスの値に応じたサイン波を鳴らす。
 func play_sound(selected_index: int) -> void:
 	if selected_index < 0 or selected_index >= sort_values.size():
@@ -109,7 +115,7 @@ func play_sound(selected_index: int) -> void:
 		elif fade_frames > 0 and i >= frame_count - fade_frames:
 			envelope = float(frame_count - i - 1) / float(fade_frames)
 
-		var sample: float = sin(sound_phase) * SOUND_VOLUME * max(envelope, 0.0)
+		var sample: float = sin(sound_phase) * SOUND_VOLUME * get_selected_volume_scale() * max(envelope, 0.0)
 		sound_playback.push_frame(Vector2(sample, sample))
 		sound_phase += TAU * frequency / SOUND_SAMPLE_RATE
 		if sound_phase >= TAU:
