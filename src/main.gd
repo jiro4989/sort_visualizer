@@ -34,6 +34,8 @@ func _ready() -> void:
 
 ## ソート対象の値を初期化する。
 func _setup_sort_values() -> void:
+	for child in sort_visualization_area.get_children():
+		child.queue_free()
 	sort_values.clear()
 	var element_count: int = get_selected_element_count()
 	var bar_width: int = floori(float(VISUALIZATION_AREA_WIDTH) / element_count)
