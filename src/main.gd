@@ -46,9 +46,9 @@ func highlight_panel(selected_index: int) -> void:
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 
 ## ステータステキストを作成する。
-func create_status_text(text: String, start_time: float, loop_count: int) -> String:
+func create_status_text(text: String, start_time: float, step_count: int) -> String:
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
-	return "%s %dms, %d step" % [text, elapsed_time, loop_count]
+	return "%s %dms, %d step" % [text, elapsed_time, step_count]
 
 func _on_run_sort_button_pressed() -> void:
 	sort(select_sort_option.text)
@@ -73,10 +73,10 @@ func sort(sort_type: String) -> void:
 ## バブルソートを実行する。
 func bubble_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
-	var loop_count: int = 0
+	var step_count: int = 0
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
-			loop_count += 1
+			step_count += 1
 			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
 
 			if sort_values[j].get_value() > sort_values[j + 1].get_value():
@@ -84,11 +84,11 @@ func bubble_sort() -> void:
 				sort_values[j].set_value(sort_values[j + 1].get_value())
 				sort_values[j + 1].set_value(temp)
 
-			status_label.text = create_status_text("Running", start_time, loop_count)
+			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻すため、範囲外の数値を渡す
-	status_label.text = create_status_text("Done", start_time, loop_count)
+	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## マージソートを実行する。
 func merge_sort() -> void:
@@ -159,7 +159,7 @@ func _apply_merge_step(values: Array[int], index: int, start_time: float, loop_c
 ## 挿入ソートを実行する。
 func insertion_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
-	var loop_count: int = 0
+	var step_count: int = 0
 
 	for i in range(1, sort_values.size()):
 		var key: int = sort_values[i].get_value()
@@ -167,35 +167,35 @@ func insertion_sort() -> void:
 
 		# key より大きい要素を右へずらす
 		while j >= 0 and sort_values[j].get_value() > key:
-			loop_count += 1
+			step_count += 1
 			highlight_panel(j)
 			sort_values[j + 1].set_value(sort_values[j].get_value())
-			status_label.text = create_status_text("Running", start_time, loop_count)
+			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
 			j -= 1
 
 		sort_values[j + 1].set_value(key)
-		loop_count += 1
+		step_count += 1
 		highlight_panel(j + 1)
-		status_label.text = create_status_text("Running", start_time, loop_count)
+		status_label.text = create_status_text("Running", start_time, step_count)
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
-	status_label.text = create_status_text("Done", start_time, loop_count)
+	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## 選択ソートを実行する。
 func selection_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
-	var loop_count: int = 0
+	var step_count: int = 0
 
 	for i in range(sort_values.size() - 1):
 		var min_index: int = i
 		for j in range(i + 1, sort_values.size()):
-			loop_count += 1
+			step_count += 1
 			highlight_panel(j)
 			if sort_values[j].get_value() < sort_values[min_index].get_value():
 				min_index = j
-			status_label.text = create_status_text("Running", start_time, loop_count)
+			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
 
 		if min_index != i:
@@ -203,18 +203,18 @@ func selection_sort() -> void:
 			sort_values[i].set_value(sort_values[min_index].get_value())
 			sort_values[min_index].set_value(temp)
 
-		loop_count += 1
+		step_count += 1
 		highlight_panel(i)
-		status_label.text = create_status_text("Running", start_time, loop_count)
+		status_label.text = create_status_text("Running", start_time, step_count)
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1)
-	status_label.text = create_status_text("Done", start_time, loop_count)
+	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## シェルソートを実行する。
 func shell_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
-	var loop_count: int = 0
+	var step_count: int = 0
 	var gap: int = floori(float(sort_values.size()) / 2.0)
 
 	while gap > 0:
@@ -223,23 +223,23 @@ func shell_sort() -> void:
 			var j: int = i
 
 			while j >= gap and sort_values[j - gap].get_value() > temp:
-				loop_count += 1
+				step_count += 1
 				highlight_panel(j)
 				sort_values[j].set_value(sort_values[j - gap].get_value())
-				status_label.text = create_status_text("Running", start_time, loop_count)
+				status_label.text = create_status_text("Running", start_time, step_count)
 				await get_tree().create_timer(SLEEP_TIME).timeout
 				j -= gap
 
 			sort_values[j].set_value(temp)
-			loop_count += 1
+			step_count += 1
 			highlight_panel(j)
-			status_label.text = create_status_text("Running", start_time, loop_count)
+			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
 
 		gap = floori(float(gap) / 2.0)
 
 	highlight_panel(-1)
-	status_label.text = create_status_text("Done", start_time, loop_count)
+	status_label.text = create_status_text("Done", start_time, step_count)
 
 ## ヒープソートを実行する。
 func heap_sort() -> void:
