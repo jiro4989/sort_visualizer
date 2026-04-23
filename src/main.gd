@@ -15,15 +15,32 @@ const BAR_HEIGHT: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE)
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
 const SLEEP_TIME: float = 0.01
+const SOUND_SAMPLE_RATE: float = 44100.0
+const SOUND_BUFFER_LENGTH: float = 0.2
+const SOUND_DURATION_SEC: float = 0.03
+const SOUND_VOLUME: float = 0.12
 var sort_values: Array[SortBar] = []
+var sound_stream: AudioStreamGenerator
+var sound_playback: AudioStreamGeneratorPlayback
+var sound_phase: float = 0.0
 
 func _ready() -> void:
+	_setup_sound_stream()
+
 	# 可視化エリアの初期化
 	for i in range(MAX_SIZE):
 		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT, BAR_DEFAULT_COLOR)
 		sort_values.append(sort_bar)
 		sort_visualization_area.add_child(sort_bar.column)
 	shuffle_sort_values()
+
+func _setup_sound_stream() -> void:
+	sound_stream = AudioStreamGenerator.new()
+	sound_stream.mix_rate = SOUND_SAMPLE_RATE
+	sound_stream.buffer_length = SOUND_BUFFER_LENGTH
+	audio_stream_player.stream = sound_stream
+	audio_stream_player.play()
+	sound_playback = audio_stream_player.get_stream_playback() as AudioStreamGeneratorPlayback
 
 func _on_shuffle_button_pressed() -> void:
 	shuffle_sort_values()
@@ -55,6 +72,10 @@ func create_status_text(text: String, start_time: float, step_count: int) -> Str
 func play_sound(selected_index: int) -> void:
 	if selected_index < 0 or selected_index >= sort_values.size():
 		return
+	if sound_playback == null:
+		_setup_sound_stream()
+		if sound_playback == null:
+			return
 
 	var v: int = sort_values[selected_index].get_value()
 
@@ -62,24 +83,23 @@ func play_sound(selected_index: int) -> void:
 	var max_hz: float = 880.0
 	var t: float = float(v - 1) / float(max(1, MAX_SIZE - 1))
 	var frequency: float = lerpf(min_hz, max_hz, t)
-	var duration_sec: float = 0.04
-	var sample_rate: float = 44100.0
-
-	var stream := AudioStreamGenerator.new()
-	stream.mix_rate = sample_rate
-	stream.buffer_length = 0.1
-	audio_stream_player.stream = stream
-
-	audio_stream_player.play()
-	var playback := audio_stream_player.get_stream_playback() as AudioStreamGeneratorPlayback
-	if playback == null:
+	var frame_count: int = int(SOUND_SAMPLE_RATE * SOUND_DURATION_SEC)
+	var fade_frames: int = int(frame_count * 0.2)
+	if sound_playback.get_frames_available() < frame_count:
 		return
 
-	var frame_count: int = int(sample_rate * duration_sec)
 	for i in range(frame_count):
-		var phase: float = TAU * frequency * float(i) / sample_rate
-		var sample: float = sin(phase) * 0.15
-		playback.push_frame(Vector2(sample, sample))
+		var envelope: float = 1.0
+		if fade_frames > 0 and i < fade_frames:
+			envelope = float(i) / float(fade_frames)
+		elif fade_frames > 0 and i >= frame_count - fade_frames:
+			envelope = float(frame_count - i - 1) / float(fade_frames)
+
+		var sample: float = sin(sound_phase) * SOUND_VOLUME * max(envelope, 0.0)
+		sound_playback.push_frame(Vector2(sample, sample))
+		sound_phase += TAU * frequency / SOUND_SAMPLE_RATE
+		if sound_phase >= TAU:
+			sound_phase = fmod(sound_phase, TAU)
 
 func _on_run_sort_button_pressed() -> void:
 	sort(select_sort_option.text)
