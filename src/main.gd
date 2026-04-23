@@ -48,7 +48,7 @@ func highlight_panel(selected_index: int) -> void:
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, loop_count: int) -> String:
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
-	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
+	return "%s %dms, %d step" % [text, elapsed_time, loop_count]
 
 func _on_run_sort_button_pressed() -> void:
 	sort(select_sort_option.text)
