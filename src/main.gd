@@ -144,7 +144,7 @@ func _on_run_sort_button_pressed() -> void:
 	run_sort_button.disabled = true
 	select_element_count_option.disabled = true
 	await sort(select_sort_option.text)
-	highlight_all_panels()
+	await highlight_all_panels()
 	shuffle_button.disabled = false
 	run_sort_button.disabled = false
 	select_element_count_option.disabled = false
