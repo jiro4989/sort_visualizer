@@ -28,12 +28,12 @@ var sound_playback: AudioStreamGeneratorPlayback
 var sound_phase: float = 0.0
 
 func _ready() -> void:
-	_setup_sound_stream()
-	_setup_sort_values()
+	setup_sound_stream()
+	setup_sort_values()
 	shuffle_sort_values()
 
 ## ソート対象の値を初期化する。
-func _setup_sort_values() -> void:
+func setup_sort_values() -> void:
 	for child in sort_visualization_area.get_children():
 		child.queue_free()
 	sort_values.clear()
@@ -49,7 +49,7 @@ func get_selected_element_count() -> int:
 	var element_count_text: String = select_element_count_option.text
 	return int(element_count_text)
 
-func _setup_sound_stream() -> void:
+func setup_sound_stream() -> void:
 	sound_stream = AudioStreamGenerator.new()
 	sound_stream.mix_rate = SOUND_SAMPLE_RATE
 	sound_stream.buffer_length = SOUND_BUFFER_LENGTH
@@ -61,7 +61,7 @@ func _on_shuffle_button_pressed() -> void:
 	shuffle_sort_values()
 
 func _on_select_element_count_option_item_selected(__index: int) -> void:
-	_setup_sort_values()
+	setup_sort_values()
 	shuffle_sort_values()
 
 ## Panel の参照自体はそのままで、sort_value の値のみシャッフルする。
@@ -109,7 +109,7 @@ func play_sound(selected_index: int) -> void:
 	if selected_index < 0 or selected_index >= sort_values.size():
 		return
 	if sound_playback == null:
-		_setup_sound_stream()
+		setup_sound_stream()
 		if sound_playback == null:
 			return
 
