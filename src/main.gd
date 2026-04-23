@@ -13,37 +13,16 @@ const BAR_WIDTH: int = floori(float(VISUALIZATION_AREA_WIDTH) / MAX_SIZE)
 const BAR_HEIGHT: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE)
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
-var sort_values: Array[int] = []
-var panels: Array[Panel] = []
+var sort_values: Array[SortBar] = []
 
 func _ready() -> void:
 	# 可視化エリアの初期化
 	for i in range(MAX_SIZE):
-		sort_values.append(i+1)
+		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT)
+		sort_values.append(sort_bar)
+		sort_visualization_area.add_child(sort_bar.column)
+
 	sort_values.shuffle()
-
-	for i in sort_values:
-		var width: int = BAR_WIDTH
-		var height: int = BAR_HEIGHT * i
-		var column: VBoxContainer = VBoxContainer.new()
-		column.custom_minimum_size = Vector2(width, 0)
-		column.size_flags_vertical = Control.SIZE_EXPAND_FILL
-
-		# 上側の余白を可変にして、バーを下寄せにする
-		var spacer: Control = Control.new()
-		spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		column.add_child(spacer)
-
-		var panel: Panel = Panel.new()
-		panel.custom_minimum_size = Vector2(0, height)
-		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-		# panel の角を丸めない
-		apply_panel_style(panel, BAR_DEFAULT_COLOR)
-
-		column.add_child(panel)
-		panels.append(panel)
-		sort_visualization_area.add_child(column)
 
 func _on_shuffle_button_pressed() -> void:
 	sort_values.shuffle()
@@ -60,24 +39,13 @@ func _on_run_sort_button_pressed() -> void:
 
 ## 可視化エリアの再描画。
 func redraw_visualization_area() -> void:
-	for i in range(MAX_SIZE):
-		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
+	for i in range(sort_values.size()):
+		sort_values[i].set_value(sort_values[i].get_value())
 
 ## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
-	for i in range(panels.size()):
-		var color: Color = BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR
-		apply_panel_style(panels[i], color)
-
-## Panel の背景色を変更する。
-func apply_panel_style(panel: Panel, color: Color) -> void:
-	var style_box := StyleBoxFlat.new()
-	style_box.bg_color = color
-	style_box.corner_radius_top_left = 0
-	style_box.corner_radius_top_right = 0
-	style_box.corner_radius_bottom_right = 0
-	style_box.corner_radius_bottom_left = 0
-	panel.add_theme_stylebox_override("panel", style_box)
+	for i in range(sort_values.size()):
+		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, loop_count: int) -> String:
@@ -93,10 +61,9 @@ func bubble_sort() -> void:
 			loop_count += 1
 			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
 
-			if sort_values[j] > sort_values[j + 1]:
-				var temp: int = sort_values[j]
-				sort_values[j] = sort_values[j + 1]
-				sort_values[j + 1] = temp
+			if sort_values[j].get_value() > sort_values[j + 1].get_value():
+				sort_values[j].set_value(sort_values[j + 1].get_value())
+				sort_values[j + 1].set_value(sort_values[j].get_value())
 				redraw_visualization_area()
 
 			status_label.text = create_status_text("Running", start_time, loop_count)
@@ -136,10 +103,10 @@ func merge_sort() -> void:
 				highlight_panel(write_index)
 
 				if left_part[li] <= right_part[ri]:
-					sort_values[write_index] = left_part[li]
+					sort_values[write_index].set_value(left_part[li])
 					li += 1
 				else:
-					sort_values[write_index] = right_part[ri]
+					sort_values[write_index].set_value(right_part[ri])
 					ri += 1
 
 				redraw_visualization_area()
@@ -148,7 +115,7 @@ func merge_sort() -> void:
 				write_index += 1
 
 			while li < left_part.size():
-				sort_values[write_index] = left_part[li]
+				sort_values[write_index].set_value(left_part[li])
 				li += 1
 				loop_count += 1
 				highlight_panel(write_index)
@@ -158,7 +125,7 @@ func merge_sort() -> void:
 				write_index += 1
 
 			while ri < right_part.size():
-				sort_values[write_index] = right_part[ri]
+				sort_values[write_index].set_value(right_part[ri])
 				ri += 1
 				loop_count += 1
 				highlight_panel(write_index)
@@ -178,20 +145,20 @@ func insertion_sort() -> void:
 	var loop_count: int = 0
 
 	for i in range(1, sort_values.size()):
-		var key: int = sort_values[i]
+		var key: int = sort_values[i].get_value()
 		var j: int = i - 1
 
 		# key より大きい要素を右へずらす
-		while j >= 0 and sort_values[j] > key:
+		while j >= 0 and sort_values[j].get_value() > key:
 			loop_count += 1
 			highlight_panel(j)
-			sort_values[j + 1] = sort_values[j]
+			sort_values[j + 1].set_value(sort_values[j].get_value())
 			redraw_visualization_area()
 			status_label.text = create_status_text("Running", start_time, loop_count)
 			await get_tree().create_timer(0.01).timeout
 			j -= 1
 
-		sort_values[j + 1] = key
+		sort_values[j + 1].set_value(key)
 		loop_count += 1
 		highlight_panel(j + 1)
 		redraw_visualization_area()
