@@ -22,10 +22,12 @@ theme_override_constants/separation = 6
 
 [node name="ShuffleButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=979694572]
 layout_mode = 2
+tooltip_text = "Shuffle values."
 text = "Shuffle"
 
 [node name="SelectSortOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=667707412]
 layout_mode = 2
+tooltip_text = "Select a sorting algorithm."
 selected = 0
 item_count = 7
 popup/item_0/text = "Bubble Sort"
@@ -49,7 +51,7 @@ text = "Run Sort"
 
 [node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1707829441]
 layout_mode = 2
-tooltip_text = "Volume"
+tooltip_text = "Select volume."
 selected = 0
 item_count = 5
 popup/item_0/text = "100"
