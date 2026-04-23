@@ -62,6 +62,7 @@ func shuffle_sort_values() -> void:
 func highlight_panel(selected_index: int) -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
+	play_sound(selected_index)
 
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, step_count: int) -> String:
@@ -134,7 +135,6 @@ func bubble_sort() -> void:
 				var temp: int = sort_values[j].get_value()
 				sort_values[j].set_value(sort_values[j + 1].get_value())
 				sort_values[j + 1].set_value(temp)
-				play_sound(j+1)
 
 			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
