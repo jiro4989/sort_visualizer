@@ -48,6 +48,8 @@ func _on_run_sort_button_pressed() -> void:
 			merge_sort()
 		"Insertion Sort":
 			insertion_sort()
+		"Selection Sort":
+			selection_sort()
 
 ## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
@@ -170,4 +172,32 @@ func insertion_sort() -> void:
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
+	status_label.text = create_status_text("Done", start_time, loop_count)
+
+## 選択ソートを実行する。
+func selection_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count: int = 0
+
+	for i in range(sort_values.size() - 1):
+		var min_index: int = i
+		for j in range(i + 1, sort_values.size()):
+			loop_count += 1
+			highlight_panel(j)
+			if sort_values[j].get_value() < sort_values[min_index].get_value():
+				min_index = j
+			status_label.text = create_status_text("Running", start_time, loop_count)
+			await get_tree().create_timer(SLEEP_TIME).timeout
+
+		if min_index != i:
+			var temp: int = sort_values[i].get_value()
+			sort_values[i].set_value(sort_values[min_index].get_value())
+			sort_values[min_index].set_value(temp)
+
+		loop_count += 1
+		highlight_panel(i)
+		status_label.text = create_status_text("Running", start_time, loop_count)
+		await get_tree().create_timer(SLEEP_TIME).timeout
+
+	highlight_panel(-1)
 	status_label.text = create_status_text("Done", start_time, loop_count)
