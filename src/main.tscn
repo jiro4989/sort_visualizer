@@ -55,5 +55,7 @@ text = "Waiting..."
 layout_mode = 2
 theme_override_constants/separation = 0
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=693163234]
+
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ShuffleButton" to="." method="_on_shuffle_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/RunSortButton" to="." method="_on_run_sort_button_pressed"]

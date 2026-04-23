@@ -3,6 +3,7 @@ extends Node2D
 @onready var select_sort_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectSortOption
 @onready var sort_visualization_area: HBoxContainer = $MarginContainer/VBoxContainer/SortVisualizationArea
 @onready var status_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StatusLabel
+@onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
 const MAX_SIZE: int = 100
 const MARGIN_SIZE: int = 6
@@ -50,6 +51,36 @@ func create_status_text(text: String, start_time: float, step_count: int) -> Str
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
 	return "%s %dms, %d step" % [text, elapsed_time, step_count]
 
+## 指定したインデックスの値に応じたサイン波を鳴らす。
+func play_sound(selected_index: int) -> void:
+	if selected_index < 0 or selected_index >= sort_values.size():
+		return
+
+	var v: int = sort_values[selected_index].get_value()
+
+	var min_hz: float = 220.0
+	var max_hz: float = 880.0
+	var t: float = float(v - 1) / float(max(1, MAX_SIZE - 1))
+	var frequency: float = lerpf(min_hz, max_hz, t)
+	var duration_sec: float = 0.04
+	var sample_rate: float = 44100.0
+
+	var stream := AudioStreamGenerator.new()
+	stream.mix_rate = sample_rate
+	stream.buffer_length = 0.1
+	audio_stream_player.stream = stream
+
+	audio_stream_player.play()
+	var playback := audio_stream_player.get_stream_playback() as AudioStreamGeneratorPlayback
+	if playback == null:
+		return
+
+	var frame_count: int = int(sample_rate * duration_sec)
+	for i in range(frame_count):
+		var phase: float = TAU * frequency * float(i) / sample_rate
+		var sample: float = sin(phase) * 0.15
+		playback.push_frame(Vector2(sample, sample))
+
 func _on_run_sort_button_pressed() -> void:
 	sort(select_sort_option.text)
 
@@ -83,6 +114,7 @@ func bubble_sort() -> void:
 				var temp: int = sort_values[j].get_value()
 				sort_values[j].set_value(sort_values[j + 1].get_value())
 				sort_values[j + 1].set_value(temp)
+				play_sound(j+1)
 
 			status_label.text = create_status_text("Running", start_time, step_count)
 			await get_tree().create_timer(SLEEP_TIME).timeout
