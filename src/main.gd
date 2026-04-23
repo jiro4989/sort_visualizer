@@ -51,7 +51,10 @@ func create_status_text(text: String, start_time: float, loop_count: int) -> Str
 	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
 
 func _on_run_sort_button_pressed() -> void:
-	match select_sort_option.text:
+	sort(select_sort_option.text)
+
+func sort(sort_type: String) -> void:
+	match sort_type:
 		"Bubble Sort":
 			bubble_sort()
 		"Merge Sort":
