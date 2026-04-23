@@ -49,9 +49,39 @@ popup/item_6/id = 6
 layout_mode = 2
 text = "Run Sort"
 
-[node name="SelectVolumeOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1707829441]
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1022156937]
 layout_mode = 2
-tooltip_text = "Select volume."
+text = "Waiting..."
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1403267722]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ElementCountLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=507319199]
+layout_mode = 2
+text = "Element count:"
+
+[node name="SelectElementCountOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1005708432]
+layout_mode = 2
+selected = 1
+item_count = 5
+popup/item_0/text = "50"
+popup/item_0/id = 0
+popup/item_1/text = "100"
+popup/item_1/id = 1
+popup/item_2/text = "200"
+popup/item_2/id = 2
+popup/item_3/text = "400"
+popup/item_3/id = 3
+popup/item_4/text = "800"
+popup/item_4/id = 4
+
+[node name="VolumeLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=643389890]
+layout_mode = 2
+text = "Volume (%):"
+
+[node name="SelectVolumeOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1707829441]
+layout_mode = 2
 selected = 0
 item_count = 5
 popup/item_0/text = "100"
@@ -65,10 +95,6 @@ popup/item_3/id = 3
 popup/item_4/text = "0"
 popup/item_4/id = 4
 
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1022156937]
-layout_mode = 2
-text = "Waiting..."
-
 [node name="SortVisualizationArea" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=263280689]
 layout_mode = 2
 theme_override_constants/separation = 0
@@ -77,3 +103,4 @@ theme_override_constants/separation = 0
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ShuffleButton" to="." method="_on_shuffle_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/RunSortButton" to="." method="_on_run_sort_button_pressed"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/HBoxContainer2/SelectElementCountOption" to="." method="_on_select_element_count_option_item_selected"]

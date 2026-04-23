@@ -4,17 +4,17 @@ extends Node2D
 @onready var select_sort_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectSortOption
 @onready var run_sort_button: Button = $MarginContainer/VBoxContainer/HBoxContainer/RunSortButton
 @onready var sort_visualization_area: HBoxContainer = $MarginContainer/VBoxContainer/SortVisualizationArea
-@onready var select_volume_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer/SelectVolumeOption
 @onready var status_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StatusLabel
+
+@onready var select_element_count_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectElementCountOption
+@onready var select_volume_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectVolumeOption
+
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
-const MAX_SIZE: int = 100
 const MARGIN_SIZE: int = 6
 const BUTTON_HEIGHT: int = 31
 const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
 const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT - MARGIN_SIZE * 2
-const BAR_WIDTH: int = floori(float(VISUALIZATION_AREA_WIDTH) / MAX_SIZE)
-const BAR_HEIGHT: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE)
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
 const SLEEP_TIME: float = 0.01
@@ -29,13 +29,23 @@ var sound_phase: float = 0.0
 
 func _ready() -> void:
 	_setup_sound_stream()
+	_setup_sort_values()
+	shuffle_sort_values()
 
-	# 可視化エリアの初期化
-	for i in range(MAX_SIZE):
-		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT, BAR_DEFAULT_COLOR)
+## ソート対象の値を初期化する。
+func _setup_sort_values() -> void:
+	sort_values.clear()
+	var element_count: int = get_selected_element_count()
+	var bar_width: int = floori(float(VISUALIZATION_AREA_WIDTH) / element_count)
+	var bar_height: int = floori(float(VISUALIZATION_AREA_HEIGHT) / element_count)
+	for i in range(element_count):
+		var sort_bar: SortBar = SortBar.new(i+1, bar_width, bar_height, BAR_DEFAULT_COLOR)
 		sort_values.append(sort_bar)
 		sort_visualization_area.add_child(sort_bar.column)
-	shuffle_sort_values()
+
+func get_selected_element_count() -> int:
+	var element_count_text: String = select_element_count_option.text
+	return int(element_count_text)
 
 func _setup_sound_stream() -> void:
 	sound_stream = AudioStreamGenerator.new()
@@ -46,6 +56,10 @@ func _setup_sound_stream() -> void:
 	sound_playback = audio_stream_player.get_stream_playback() as AudioStreamGeneratorPlayback
 
 func _on_shuffle_button_pressed() -> void:
+	shuffle_sort_values()
+
+func _on_select_element_count_option_item_selected(__index: int) -> void:
+	_setup_sort_values()
 	shuffle_sort_values()
 
 ## Panel の参照自体はそのままで、sort_value の値のみシャッフルする。
@@ -101,7 +115,7 @@ func play_sound(selected_index: int) -> void:
 
 	var min_hz: float = 220.0
 	var max_hz: float = 880.0
-	var t: float = float(v - 1) / float(max(1, MAX_SIZE - 1))
+	var t: float = float(v - 1) / float(max(1, get_selected_element_count() - 1))
 	var frequency: float = lerpf(min_hz, max_hz, t)
 	var frame_count: int = int(SOUND_SAMPLE_RATE * SOUND_DURATION_SEC)
 	var fade_frames: int = int(frame_count * 0.2)
@@ -124,10 +138,12 @@ func play_sound(selected_index: int) -> void:
 func _on_run_sort_button_pressed() -> void:
 	shuffle_button.disabled = true
 	run_sort_button.disabled = true
+	select_element_count_option.disabled = true
 	await sort(select_sort_option.text)
 	highlight_all_panels()
 	shuffle_button.disabled = false
 	run_sort_button.disabled = false
+	select_element_count_option.disabled = false
 
 func sort(sort_type: String) -> void:
 	match sort_type:
