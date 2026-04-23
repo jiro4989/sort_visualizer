@@ -22,7 +22,6 @@ func _ready() -> void:
 		sort_values.append(i+1)
 	sort_values.shuffle()
 
-	# Panel を生成して MAX_SIZE 分だけ生成する
 	for i in sort_values:
 		var width: int = BAR_WIDTH
 		var height: int = BAR_HEIGHT * i
@@ -59,15 +58,18 @@ func _on_run_sort_button_pressed() -> void:
 		"Insertion Sort":
 			insertion_sort()
 
+## 可視化エリアの再描画。
 func redraw_visualization_area() -> void:
 	for i in range(MAX_SIZE):
 		panels[i].custom_minimum_size = Vector2(0, BAR_HEIGHT * sort_values[i])
 
+## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
 	for i in range(panels.size()):
 		var color: Color = BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR
 		apply_panel_style(panels[i], color)
 
+## Panel の背景色を変更する。
 func apply_panel_style(panel: Panel, color: Color) -> void:
 	var style_box := StyleBoxFlat.new()
 	style_box.bg_color = color
@@ -77,10 +79,12 @@ func apply_panel_style(panel: Panel, color: Color) -> void:
 	style_box.corner_radius_bottom_left = 0
 	panel.add_theme_stylebox_override("panel", style_box)
 
+## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, loop_count: int) -> String:
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
 	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
 
+## バブルソートを実行する。
 func bubble_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
 	var loop_count: int = 0
@@ -101,6 +105,7 @@ func bubble_sort() -> void:
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻すため、範囲外の数値を渡す
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
+## マージソートを実行する。
 func merge_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
 	var loop_count: int = 0
@@ -167,6 +172,7 @@ func merge_sort() -> void:
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
 	status_label.text = create_status_text("Done", start_time, loop_count)
 
+## 挿入ソートを実行する。
 func insertion_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
 	var loop_count: int = 0
