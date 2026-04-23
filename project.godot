@@ -15,7 +15,7 @@ config/description="ソートアルゴリズムの動作を可視化するツー
 config/version="0.1.0"
 run/main_scene="uid://ctftnv5dts0ai"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://assets/image/icon.svg"
 
 [display]
 
