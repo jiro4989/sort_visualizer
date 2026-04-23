@@ -13,6 +13,7 @@ const BAR_WIDTH: int = floori(float(VISUALIZATION_AREA_WIDTH) / MAX_SIZE)
 const BAR_HEIGHT: int = floori(float(VISUALIZATION_AREA_HEIGHT) / MAX_SIZE)
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
+const SLEEP_TIME: float = 0.01
 var sort_values: Array[SortBar] = []
 
 func _ready() -> void:
@@ -73,7 +74,7 @@ func bubble_sort() -> void:
 				sort_values[j + 1].set_value(temp)
 
 			status_label.text = create_status_text("Running", start_time, loop_count)
-			await get_tree().create_timer(0.01).timeout
+			await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻すため、範囲外の数値を渡す
 	status_label.text = create_status_text("Done", start_time, loop_count)
@@ -142,7 +143,7 @@ func _apply_merge_step(values: Array[int], index: int, start_time: float, loop_c
 	loop_count_box[0] += 1
 	highlight_panel(index)
 	status_label.text = create_status_text("Running", start_time, loop_count_box[0])
-	await get_tree().create_timer(0.01).timeout
+	await get_tree().create_timer(SLEEP_TIME).timeout
 
 ## 挿入ソートを実行する。
 func insertion_sort() -> void:
@@ -159,14 +160,14 @@ func insertion_sort() -> void:
 			highlight_panel(j)
 			sort_values[j + 1].set_value(sort_values[j].get_value())
 			status_label.text = create_status_text("Running", start_time, loop_count)
-			await get_tree().create_timer(0.01).timeout
+			await get_tree().create_timer(SLEEP_TIME).timeout
 			j -= 1
 
 		sort_values[j + 1].set_value(key)
 		loop_count += 1
 		highlight_panel(j + 1)
 		status_label.text = create_status_text("Running", start_time, loop_count)
-		await get_tree().create_timer(0.01).timeout
+		await get_tree().create_timer(SLEEP_TIME).timeout
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
 	status_label.text = create_status_text("Done", start_time, loop_count)
