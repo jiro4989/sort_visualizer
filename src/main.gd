@@ -98,8 +98,8 @@ func highlight_all_panels() -> void:
 
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, step_count: int) -> String:
-	var elapsed_time: float = Time.get_ticks_msec() - start_time
-	return "%s %dms, %d step" % [text, elapsed_time, step_count]
+	var elapsed_seconds: float = (Time.get_ticks_msec() - start_time) / 1000.0
+	return "%s: %.1fs, %d step" % [text, elapsed_seconds, step_count]
 
 func get_selected_volume_scale() -> float:
 	var volume_text: String = select_volume_option.text
