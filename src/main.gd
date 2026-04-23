@@ -52,6 +52,8 @@ func _on_run_sort_button_pressed() -> void:
 			selection_sort()
 		"Shell Sort":
 			shell_sort()
+		"Heap Sort":
+			heap_sort()
 
 ## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
@@ -233,3 +235,60 @@ func shell_sort() -> void:
 
 	highlight_panel(-1)
 	status_label.text = create_status_text("Done", start_time, loop_count)
+
+## ヒープソートを実行する。
+func heap_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count_box: Array[int] = [0]
+	var size: int = sort_values.size()
+
+	for i in range(floori(float(size) / 2.0) - 1, -1, -1):
+		await _heapify(size, i, start_time, loop_count_box)
+
+	for end_index in range(size - 1, 0, -1):
+		var temp: int = sort_values[0].get_value()
+		sort_values[0].set_value(sort_values[end_index].get_value())
+		sort_values[end_index].set_value(temp)
+
+		loop_count_box[0] += 1
+		highlight_panel(end_index)
+		status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+		await get_tree().create_timer(SLEEP_TIME).timeout
+
+		await _heapify(end_index, 0, start_time, loop_count_box)
+
+	highlight_panel(-1)
+	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
+
+func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box: Array[int]) -> void:
+	var largest: int = root_index
+	var left: int = 2 * root_index + 1
+	var right: int = 2 * root_index + 2
+
+	if left < heap_size:
+		loop_count_box[0] += 1
+		highlight_panel(left)
+		status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+		await get_tree().create_timer(SLEEP_TIME).timeout
+		if sort_values[left].get_value() > sort_values[largest].get_value():
+			largest = left
+
+	if right < heap_size:
+		loop_count_box[0] += 1
+		highlight_panel(right)
+		status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+		await get_tree().create_timer(SLEEP_TIME).timeout
+		if sort_values[right].get_value() > sort_values[largest].get_value():
+			largest = right
+
+	if largest != root_index:
+		var temp: int = sort_values[root_index].get_value()
+		sort_values[root_index].set_value(sort_values[largest].get_value())
+		sort_values[largest].set_value(temp)
+
+		loop_count_box[0] += 1
+		highlight_panel(largest)
+		status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+		await get_tree().create_timer(SLEEP_TIME).timeout
+
+		await _heapify(heap_size, largest, start_time, loop_count_box)
