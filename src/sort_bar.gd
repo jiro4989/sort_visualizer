@@ -1,15 +1,12 @@
 class_name SortBar
 
-const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
-const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
-
 var value: int
 var column: VBoxContainer
 var panel: Panel
 var bar_width: int
 var bar_height: int
 
-func _init(_value: int, _bar_width: int, _bar_height: int) -> void:
+func _init(_value: int, _bar_width: int, _bar_height: int, color: Color) -> void:
 	value = _value
 	bar_width = _bar_width
 	bar_height = _bar_height
@@ -27,7 +24,7 @@ func _init(_value: int, _bar_width: int, _bar_height: int) -> void:
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	set_value(value)
-	apply_panel_style(BAR_DEFAULT_COLOR)
+	apply_panel_style(color)
 	column.add_child(panel)
 
 ## Panel の背景色を変更する。

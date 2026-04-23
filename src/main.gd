@@ -19,7 +19,7 @@ var sort_values: Array[SortBar] = []
 func _ready() -> void:
 	# 可視化エリアの初期化
 	for i in range(MAX_SIZE):
-		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT)
+		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT, BAR_DEFAULT_COLOR)
 		sort_values.append(sort_bar)
 		sort_visualization_area.add_child(sort_bar.column)
 	shuffle_sort_values()
