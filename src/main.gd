@@ -66,6 +66,14 @@ func highlight_panel(selected_index: int) -> void:
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 	play_sound(selected_index)
 
+## 先頭から順にハイライトして、最後に全てのパネルをデフォルトに戻す。
+## 主にソート完了後の強調目的で使用する。
+func highlight_all_panels() -> void:
+	for i in range(sort_values.size()):
+		highlight_panel(i)
+		await get_tree().create_timer(SLEEP_TIME).timeout
+	highlight_panel(-1)
+
 ## ステータステキストを作成する。
 func create_status_text(text: String, start_time: float, step_count: int) -> String:
 	var elapsed_time: float = Time.get_ticks_msec() - start_time
@@ -108,6 +116,7 @@ func _on_run_sort_button_pressed() -> void:
 	shuffle_button.disabled = true
 	run_sort_button.disabled = true
 	await sort(select_sort_option.text)
+	highlight_all_panels()
 	shuffle_button.disabled = false
 	run_sort_button.disabled = false
 
