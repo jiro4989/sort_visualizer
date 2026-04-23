@@ -54,6 +54,8 @@ func _on_run_sort_button_pressed() -> void:
 			shell_sort()
 		"Heap Sort":
 			heap_sort()
+		"Quick Sort":
+			quick_sort()
 
 ## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
@@ -292,3 +294,51 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 		await get_tree().create_timer(SLEEP_TIME).timeout
 
 		await _heapify(heap_size, largest, start_time, loop_count_box)
+
+## クイックソートを実行する。
+func quick_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var loop_count_box: Array[int] = [0]
+
+	if sort_values.size() > 1:
+		await _quick_sort_range(0, sort_values.size() - 1, start_time, loop_count_box)
+
+	highlight_panel(-1)
+	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
+
+func _quick_sort_range(low: int, high: int, start_time: float, loop_count_box: Array[int]) -> void:
+	if low >= high:
+		return
+
+	var pivot_index: int = await _partition(low, high, start_time, loop_count_box)
+	await _quick_sort_range(low, pivot_index - 1, start_time, loop_count_box)
+	await _quick_sort_range(pivot_index + 1, high, start_time, loop_count_box)
+
+func _partition(low: int, high: int, start_time: float, loop_count_box: Array[int]) -> int:
+	var pivot_value: int = sort_values[high].get_value()
+	var store_index: int = low
+
+	for scan_index in range(low, high):
+		loop_count_box[0] += 1
+		highlight_panel(scan_index)
+		status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+		await get_tree().create_timer(SLEEP_TIME).timeout
+
+		if sort_values[scan_index].get_value() <= pivot_value:
+			if store_index != scan_index:
+				var temp: int = sort_values[store_index].get_value()
+				sort_values[store_index].set_value(sort_values[scan_index].get_value())
+				sort_values[scan_index].set_value(temp)
+			store_index += 1
+
+	loop_count_box[0] += 1
+	highlight_panel(store_index)
+	status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+	await get_tree().create_timer(SLEEP_TIME).timeout
+
+	if store_index != high:
+		var temp: int = sort_values[store_index].get_value()
+		sort_values[store_index].set_value(sort_values[high].get_value())
+		sort_values[high].set_value(temp)
+
+	return store_index
