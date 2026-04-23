@@ -21,11 +21,23 @@ func _ready() -> void:
 		var sort_bar: SortBar = SortBar.new(i+1, BAR_WIDTH, BAR_HEIGHT)
 		sort_values.append(sort_bar)
 		sort_visualization_area.add_child(sort_bar.column)
-
-	sort_values.shuffle()
+	shuffle_sort_values()
 
 func _on_shuffle_button_pressed() -> void:
-	sort_values.shuffle()
+	shuffle_sort_values()
+
+## Panel の参照自体はそのままで、sort_value の値のみシャッフルする。
+##
+## sort_values は Panel を内包するため、sort_values 自体をシャッフルすると
+## value とともに Panel の参照も移動してしまうため、結果的に
+## UI 上では変化していないように見えてしまうため、sort_value の値のみシャッフルする。
+func shuffle_sort_values() -> void:
+	var values: Array[int] = []
+	for i in range(sort_values.size()):
+		values.append(sort_values[i].get_value())
+	values.shuffle()
+	for i in range(sort_values.size()):
+		sort_values[i].set_value(values[i])
 	redraw_visualization_area()
 
 func _on_run_sort_button_pressed() -> void:
@@ -62,8 +74,9 @@ func bubble_sort() -> void:
 			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
 
 			if sort_values[j].get_value() > sort_values[j + 1].get_value():
+				var temp: int = sort_values[j].get_value()
 				sort_values[j].set_value(sort_values[j + 1].get_value())
-				sort_values[j + 1].set_value(sort_values[j].get_value())
+				sort_values[j + 1].set_value(temp)
 				redraw_visualization_area()
 
 			status_label.text = create_status_text("Running", start_time, loop_count)
