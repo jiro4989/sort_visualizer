@@ -77,7 +77,6 @@ func bubble_sort() -> void:
 				var temp: int = sort_values[j].get_value()
 				sort_values[j].set_value(sort_values[j + 1].get_value())
 				sort_values[j + 1].set_value(temp)
-				redraw_visualization_area()
 
 			status_label.text = create_status_text("Running", start_time, loop_count)
 			await get_tree().create_timer(0.01).timeout
