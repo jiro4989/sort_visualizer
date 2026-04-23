@@ -40,6 +40,16 @@ func shuffle_sort_values() -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].set_value(values[i])
 
+## 指定したインデックスの Panel の背景色を変更する。
+func highlight_panel(selected_index: int) -> void:
+	for i in range(sort_values.size()):
+		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
+
+## ステータステキストを作成する。
+func create_status_text(text: String, start_time: float, loop_count: int) -> String:
+	var elapsed_time: float = Time.get_ticks_msec() - start_time
+	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
+
 func _on_run_sort_button_pressed() -> void:
 	match select_sort_option.text:
 		"Bubble Sort":
@@ -56,16 +66,6 @@ func _on_run_sort_button_pressed() -> void:
 			heap_sort()
 		"Quick Sort":
 			quick_sort()
-
-## 指定したインデックスの Panel の背景色を変更する。
-func highlight_panel(selected_index: int) -> void:
-	for i in range(sort_values.size()):
-		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
-
-## ステータステキストを作成する。
-func create_status_text(text: String, start_time: float, loop_count: int) -> String:
-	var elapsed_time: float = Time.get_ticks_msec() - start_time
-	return "%s %dms, %d loops" % [text, elapsed_time, loop_count]
 
 ## バブルソートを実行する。
 func bubble_sort() -> void:
