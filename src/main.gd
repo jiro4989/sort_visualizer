@@ -38,7 +38,6 @@ func shuffle_sort_values() -> void:
 	values.shuffle()
 	for i in range(sort_values.size()):
 		sort_values[i].set_value(values[i])
-	redraw_visualization_area()
 
 func _on_run_sort_button_pressed() -> void:
 	match select_sort_option.text:
@@ -165,7 +164,6 @@ func insertion_sort() -> void:
 			loop_count += 1
 			highlight_panel(j)
 			sort_values[j + 1].set_value(sort_values[j].get_value())
-			redraw_visualization_area()
 			status_label.text = create_status_text("Running", start_time, loop_count)
 			await get_tree().create_timer(0.01).timeout
 			j -= 1
@@ -173,7 +171,6 @@ func insertion_sort() -> void:
 		sort_values[j + 1].set_value(key)
 		loop_count += 1
 		highlight_panel(j + 1)
-		redraw_visualization_area()
 		status_label.text = create_status_text("Running", start_time, loop_count)
 		await get_tree().create_timer(0.01).timeout
 
