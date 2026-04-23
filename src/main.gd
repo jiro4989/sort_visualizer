@@ -86,69 +86,68 @@ func bubble_sort() -> void:
 ## マージソートを実行する。
 func merge_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
-	var loop_count: int = 0
-	var n: int = sort_values.size()
-	var width: int = 1
+	var values: Array[int] = []
+	var loop_count_box: Array[int] = [0]
 
-	while width < n:
-		for left in range(0, n, width * 2):
-			var mid: int = mini(left + width, n)
-			var right: int = mini(left + width * 2, n)
-			if mid >= right:
-				continue
+	for i in range(sort_values.size()):
+		values.append(sort_values[i].get_value())
 
-			var left_part: Array[int] = []
-			for i in range(left, mid):
-				left_part.append(sort_values[i])
-
-			var right_part: Array[int] = []
-			for i in range(mid, right):
-				right_part.append(sort_values[i])
-
-			var li: int = 0
-			var ri: int = 0
-			var write_index: int = left
-
-			while li < left_part.size() and ri < right_part.size():
-				loop_count += 1
-				highlight_panel(write_index)
-
-				if left_part[li] <= right_part[ri]:
-					sort_values[write_index].set_value(left_part[li])
-					li += 1
-				else:
-					sort_values[write_index].set_value(right_part[ri])
-					ri += 1
-
-				redraw_visualization_area()
-				status_label.text = create_status_text("Running", start_time, loop_count)
-				await get_tree().create_timer(0.01).timeout
-				write_index += 1
-
-			while li < left_part.size():
-				sort_values[write_index].set_value(left_part[li])
-				li += 1
-				loop_count += 1
-				highlight_panel(write_index)
-				redraw_visualization_area()
-				status_label.text = create_status_text("Running", start_time, loop_count)
-				await get_tree().create_timer(0.01).timeout
-				write_index += 1
-
-			while ri < right_part.size():
-				sort_values[write_index].set_value(right_part[ri])
-				ri += 1
-				loop_count += 1
-				highlight_panel(write_index)
-				redraw_visualization_area()
-				status_label.text = create_status_text("Running", start_time, loop_count)
-				await get_tree().create_timer(0.01).timeout
-				write_index += 1
-
-		width *= 2
+	if values.size() > 1:
+		await _merge_sort_range(values, 0, values.size() - 1, start_time, loop_count_box)
 
 	highlight_panel(-1) # 全ての Panel の背景色をデフォルトに戻す
-	status_label.text = create_status_text("Done", start_time, loop_count)
+	status_label.text = create_status_text("Done", start_time, loop_count_box[0])
+
+func _merge_sort_range(values: Array[int], left: int, right: int, start_time: float, loop_count_box: Array[int]) -> void:
+	if left >= right:
+		return
+
+	var mid: int = floori(float(left + right) / 2.0)
+	await _merge_sort_range(values, left, mid, start_time, loop_count_box)
+	await _merge_sort_range(values, mid + 1, right, start_time, loop_count_box)
+	await _merge(values, left, mid, right, start_time, loop_count_box)
+
+func _merge(values: Array[int], left: int, mid: int, right: int, start_time: float, loop_count_box: Array[int]) -> void:
+	var left_part: Array[int] = []
+	var right_part: Array[int] = []
+
+	for i in range(left, mid + 1):
+		left_part.append(values[i])
+	for i in range(mid + 1, right + 1):
+		right_part.append(values[i])
+
+	var left_index: int = 0
+	var right_index: int = 0
+	var merged_index: int = left
+
+	while left_index < left_part.size() and right_index < right_part.size():
+		if left_part[left_index] <= right_part[right_index]:
+			values[merged_index] = left_part[left_index]
+			left_index += 1
+		else:
+			values[merged_index] = right_part[right_index]
+			right_index += 1
+		await _apply_merge_step(values, merged_index, start_time, loop_count_box)
+		merged_index += 1
+
+	while left_index < left_part.size():
+		values[merged_index] = left_part[left_index]
+		left_index += 1
+		await _apply_merge_step(values, merged_index, start_time, loop_count_box)
+		merged_index += 1
+
+	while right_index < right_part.size():
+		values[merged_index] = right_part[right_index]
+		right_index += 1
+		await _apply_merge_step(values, merged_index, start_time, loop_count_box)
+		merged_index += 1
+
+func _apply_merge_step(values: Array[int], index: int, start_time: float, loop_count_box: Array[int]) -> void:
+	sort_values[index].set_value(values[index])
+	loop_count_box[0] += 1
+	highlight_panel(index)
+	status_label.text = create_status_text("Running", start_time, loop_count_box[0])
+	await get_tree().create_timer(0.01).timeout
 
 ## 挿入ソートを実行する。
 func insertion_sort() -> void:
