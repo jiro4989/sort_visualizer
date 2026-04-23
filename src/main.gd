@@ -48,11 +48,6 @@ func _on_run_sort_button_pressed() -> void:
 		"Insertion Sort":
 			insertion_sort()
 
-## 可視化エリアの再描画。
-func redraw_visualization_area() -> void:
-	for i in range(sort_values.size()):
-		sort_values[i].set_value(sort_values[i].get_value())
-
 ## 指定したインデックスの Panel の背景色を変更する。
 func highlight_panel(selected_index: int) -> void:
 	for i in range(sort_values.size()):
