@@ -14,7 +14,7 @@ extends Node2D
 const MARGIN_SIZE: int = 6
 const BUTTON_HEIGHT: int = 31
 const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
-const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT - MARGIN_SIZE * 2
+const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT * 2 - MARGIN_SIZE * 4
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
 const SLEEP_TIME: float = 0.01
@@ -38,9 +38,11 @@ func setup_sort_values() -> void:
 		child.queue_free()
 	sort_values.clear()
 	var element_count: int = get_selected_element_count()
-	var bar_width: int = floori(float(VISUALIZATION_AREA_WIDTH) / element_count)
-	var bar_height: int = floori(float(VISUALIZATION_AREA_HEIGHT) / element_count)
+	var base_bar_width: int = floori(float(VISUALIZATION_AREA_WIDTH) / element_count)
+	var width_remainder: int = VISUALIZATION_AREA_WIDTH - base_bar_width * element_count
+	var bar_height: float = floori(float(VISUALIZATION_AREA_HEIGHT) / element_count)
 	for i in range(element_count):
+		var bar_width: int = base_bar_width + (1 if i < width_remainder else 0)
 		var sort_bar: SortBar = SortBar.new(i+1, bar_width, bar_height, BAR_DEFAULT_COLOR)
 		sort_values.append(sort_bar)
 		sort_visualization_area.add_child(sort_bar.column)

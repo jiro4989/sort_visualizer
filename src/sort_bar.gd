@@ -3,10 +3,10 @@ class_name SortBar
 var value: int
 var column: VBoxContainer
 var panel: Panel
-var bar_width: int
-var bar_height: int
+var bar_width: float
+var bar_height: float
 
-func _init(_value: int, _bar_width: int, _bar_height: int, color: Color) -> void:
+func _init(_value: int, _bar_width: float, _bar_height: float, color: Color) -> void:
 	value = _value
 	bar_width = _bar_width
 	bar_height = _bar_height
