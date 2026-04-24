@@ -10,7 +10,7 @@ var sound_playback: AudioStreamGeneratorPlayback
 var sound_phase: float = 0.0
 var audio_stream_player: AudioStreamPlayer
 
-func setup(player: AudioStreamPlayer) -> void:
+func _init(player: AudioStreamPlayer) -> void:
 	audio_stream_player = player
 	_setup_sound_stream()
 

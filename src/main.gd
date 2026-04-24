@@ -24,7 +24,7 @@ const MESSAGE_RUNNING: String = "Running"
 const MESSAGE_DONE: String = "Done"
 
 var sort_values: Array[SortBar] = []
-var sound_controller: SoundController = SoundController.new()
+var sound_controller: SoundController
 
 # ソートアルゴリズムを追加するたびに tscn ファイルを編集するのが面倒なので
 # Option 要素はコードですべて定義して、初期化時に Item を追加する。
@@ -50,7 +50,7 @@ var sort_algorithms_map: Dictionary[String, Sorter] = {}
 
 func _ready() -> void:
 	setup_visualization_layout()
-	sound_controller.setup(audio_stream_player)
+	sound_controller = SoundController.new(audio_stream_player)
 	setup_sort_algorithm()
 	setup_sort_values()
 	shuffle_sort_values()
