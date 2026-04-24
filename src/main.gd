@@ -9,6 +9,7 @@ extends Node2D
 @onready var select_element_count_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectElementCountOption
 @onready var select_volume_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectVolumeOption
 @onready var select_wait_time_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectWaitTimeOption
+@onready var select_animation_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectAnimationOption
 
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
@@ -120,6 +121,16 @@ func _on_shuffle_button_pressed() -> void:
 func _on_select_element_count_option_item_selected(__index: int) -> void:
 	setup_sort_values()
 	shuffle_sort_values()
+	setup_animation()
+
+## アニメーションの有効無効を切り替える。
+func _on_select_animation_option_item_selected(__index):
+	setup_animation()
+
+func setup_animation() -> void:
+	var enable_animation: bool = select_animation_option.text == "true"
+	for i in range(sort_values.size()):
+		sort_values[i].set_enable_animation(enable_animation)
 
 ## Panel の参照自体はそのままで、sort_value の値のみシャッフルする。
 ##
@@ -202,11 +213,15 @@ func _on_run_sort_button_pressed() -> void:
 	shuffle_button.disabled = true
 	run_sort_button.disabled = true
 	select_element_count_option.disabled = true
+	select_animation_option.disabled = true
+
 	await sort(select_sort_option.text)
 	await highlight_all_panels()
+
 	shuffle_button.disabled = false
 	run_sort_button.disabled = false
 	select_element_count_option.disabled = false
+	select_animation_option.disabled = false
 
 func sort(sort_type: String) -> void:
 	await sort_algorithms_map[sort_type].sort.call()

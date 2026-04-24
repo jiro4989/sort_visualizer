@@ -97,6 +97,19 @@ popup/item_2/id = 2
 popup/item_3/text = "1000"
 popup/item_3/id = 3
 
+[node name="AnimationLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1591141874]
+layout_mode = 2
+text = "Animation:"
+
+[node name="SelectAnimationOption" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1638635727]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "false"
+popup/item_0/id = 0
+popup/item_1/text = "true"
+popup/item_1/id = 1
+
 [node name="SortVisualizationArea" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=263280689]
 layout_mode = 2
 theme_override_constants/separation = 0
@@ -106,3 +119,4 @@ theme_override_constants/separation = 0
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ShuffleButton" to="." method="_on_shuffle_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/RunSortButton" to="." method="_on_run_sort_button_pressed"]
 [connection signal="item_selected" from="MarginContainer/VBoxContainer/HBoxContainer2/SelectElementCountOption" to="." method="_on_select_element_count_option_item_selected"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/HBoxContainer2/SelectAnimationOption" to="." method="_on_select_animation_option_item_selected"]

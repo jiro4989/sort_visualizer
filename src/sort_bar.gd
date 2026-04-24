@@ -4,8 +4,11 @@ var value: int
 var column: VBoxContainer
 var panel: Panel
 var panel_style: StyleBoxFlat
+var height_tween: Tween
 var bar_width: float
 var bar_height: float
+var enable_animation: bool = false
+const HEIGHT_ANIMATION_SEC: float = 0.08
 
 func _init(_value: int, _bar_width: float, _bar_height: float, color: Color) -> void:
 	value = _value
@@ -49,4 +52,23 @@ func get_value() -> int:
 
 func set_value(_value: int) -> void:
 	value = _value
-	panel.custom_minimum_size = Vector2(0, _value * bar_height)
+	var target_size := Vector2(0, _value * bar_height)
+
+	# アニメーション無効時や初期化直後は即時反映する。
+	if not enable_animation or not panel.is_inside_tree():
+		if is_instance_valid(height_tween):
+			height_tween.kill()
+		panel.custom_minimum_size = target_size
+		return
+
+	if is_instance_valid(height_tween):
+		height_tween.kill()
+
+	height_tween = panel.create_tween()
+	height_tween.set_trans(Tween.TRANS_SINE)
+	height_tween.set_ease(Tween.EASE_OUT)
+	height_tween.tween_property(panel, "custom_minimum_size", target_size, HEIGHT_ANIMATION_SEC)
+
+## 値変更時のアニメーションの有効無効を変更する。
+func set_enable_animation(enable: bool) -> void:
+	enable_animation = enable
