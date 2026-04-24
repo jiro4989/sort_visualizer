@@ -8,6 +8,7 @@ extends Node2D
 
 @onready var select_element_count_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectElementCountOption
 @onready var select_volume_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectVolumeOption
+@onready var select_wait_time_option: OptionButton = $MarginContainer/VBoxContainer/HBoxContainer2/SelectWaitTimeOption
 
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
@@ -17,7 +18,6 @@ const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
 const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT * 2 - MARGIN_SIZE * 4
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
-const SLEEP_TIME: float = 0.01
 const SOUND_SAMPLE_RATE: float = 44100.0
 const SOUND_BUFFER_LENGTH: float = 0.2
 const SOUND_DURATION_SEC: float = 0.03
@@ -88,6 +88,15 @@ func get_selected_element_count() -> int:
 	var element_count_text: String = select_element_count_option.text
 	return int(element_count_text)
 
+func get_selected_wait_time_seconds() -> float:
+	# UI 上の待機時間がミリ秒だが、GDScript の待機時間は秒単位なのでミリ秒を秒に変換する。
+	var wait_time_text: String = select_wait_time_option.text
+	return float(wait_time_text) / 1000.0
+
+## 待機時間を設定した秒数分待機する。
+func wait() -> void:
+	await get_tree().create_timer(get_selected_wait_time_seconds()).timeout
+
 func setup_sound_stream() -> void:
 	sound_stream = AudioStreamGenerator.new()
 	sound_stream.mix_rate = SOUND_SAMPLE_RATE
@@ -132,7 +141,7 @@ func highlight_off() -> void:
 func highlight_all_panels() -> void:
 	for i in range(sort_values.size()):
 		highlight_panel(i)
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 	highlight_off()
 
 ## ステータステキストを作成する。
@@ -206,7 +215,7 @@ func bubble_sort() -> void:
 				sort_values[j + 1].set_value(temp)
 
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-			await get_tree().create_timer(SLEEP_TIME).timeout
+			await wait()
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
@@ -275,7 +284,7 @@ func _apply_merge_step(values: Array[int], index: int, start_time: float, loop_c
 	loop_count_box[0] += 1
 	highlight_panel(index)
 	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-	await get_tree().create_timer(SLEEP_TIME).timeout
+	await wait()
 
 ## 挿入ソートを実行する。
 func insertion_sort() -> void:
@@ -292,14 +301,14 @@ func insertion_sort() -> void:
 			highlight_panel(j)
 			sort_values[j + 1].set_value(sort_values[j].get_value())
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-			await get_tree().create_timer(SLEEP_TIME).timeout
+			await wait()
 			j -= 1
 
 		sort_values[j + 1].set_value(key)
 		step_count += 1
 		highlight_panel(j + 1)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
@@ -317,7 +326,7 @@ func selection_sort() -> void:
 			if sort_values[j].get_value() < sort_values[min_index].get_value():
 				min_index = j
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-			await get_tree().create_timer(SLEEP_TIME).timeout
+			await wait()
 
 		if min_index != i:
 			var temp: int = sort_values[i].get_value()
@@ -327,7 +336,7 @@ func selection_sort() -> void:
 		step_count += 1
 		highlight_panel(i)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
@@ -348,14 +357,14 @@ func shell_sort() -> void:
 				highlight_panel(j)
 				sort_values[j].set_value(sort_values[j - gap].get_value())
 				status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-				await get_tree().create_timer(SLEEP_TIME).timeout
+				await wait()
 				j -= gap
 
 			sort_values[j].set_value(temp)
 			step_count += 1
 			highlight_panel(j)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-			await get_tree().create_timer(SLEEP_TIME).timeout
+			await wait()
 
 		gap = floori(float(gap) / 2.0)
 
@@ -379,7 +388,7 @@ func heap_sort() -> void:
 		loop_count_box[0] += 1
 		highlight_panel(end_index)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 		await _heapify(end_index, 0, start_time, loop_count_box)
 
@@ -395,7 +404,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 		loop_count_box[0] += 1
 		highlight_panel(left)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 		if sort_values[left].get_value() > sort_values[largest].get_value():
 			largest = left
 
@@ -403,7 +412,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 		loop_count_box[0] += 1
 		highlight_panel(right)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 		if sort_values[right].get_value() > sort_values[largest].get_value():
 			largest = right
 
@@ -415,7 +424,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 		loop_count_box[0] += 1
 		highlight_panel(largest)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 		await _heapify(heap_size, largest, start_time, loop_count_box)
 
@@ -446,7 +455,7 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 		loop_count_box[0] += 1
 		highlight_panel(scan_index)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 		if sort_values[scan_index].get_value() <= pivot_value:
 			if store_index != scan_index:
@@ -458,7 +467,7 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 	loop_count_box[0] += 1
 	highlight_panel(store_index)
 	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
-	await get_tree().create_timer(SLEEP_TIME).timeout
+	await wait()
 
 	if store_index != high:
 		var temp: int = sort_values[store_index].get_value()
@@ -484,7 +493,7 @@ func counting_sort() -> void:
 		temp_values[i] = value 
 		highlight_panel(i)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 	
 	# コピーした値を sort_value のインデックスに指定して代入する
 	for i in range(temp_values.size()):
@@ -493,7 +502,7 @@ func counting_sort() -> void:
 		sort_values[value - 1].set_value(value)
 		highlight_panel(value - 1)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-		await get_tree().create_timer(SLEEP_TIME).timeout
+		await wait()
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
