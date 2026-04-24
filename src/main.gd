@@ -93,9 +93,13 @@ func get_selected_wait_time_seconds() -> float:
 	var wait_time_text: String = select_wait_time_option.text
 	return float(wait_time_text) / 1000.0
 
-## 待機時間を設定した秒数分待機する。
+## 待機時間を UI 上で設定した秒数分待機する。
 func wait() -> void:
-	await get_tree().create_timer(get_selected_wait_time_seconds()).timeout
+	await wait_seconds(get_selected_wait_time_seconds())
+
+## 指定した秒数分待機する。
+func wait_seconds(seconds: float) -> void:
+	await get_tree().create_timer(seconds).timeout
 
 func setup_sound_stream() -> void:
 	sound_stream = AudioStreamGenerator.new()
@@ -141,7 +145,9 @@ func highlight_off() -> void:
 func highlight_all_panels() -> void:
 	for i in range(sort_values.size()):
 		highlight_panel(i)
-		await wait()
+		# このハイライトはソート完了後の強調表示に過ぎないため、
+		# さっさと処理を終わらせた方が体験が良いと思うので、待機時間を固定で小さい値とする。
+		await wait_seconds(0.01)
 	highlight_off()
 
 ## ステータステキストを作成する。
