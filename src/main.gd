@@ -43,6 +43,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Quick Sort", quick_sort),
 	Sorter.new("Pigeonhole Sort", pigeonhole_sort),
 	Sorter.new("Radix Sort", radix_sort),
+	Sorter.new("Bucket Sort", bucket_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -573,6 +574,62 @@ func radix_sort() -> void:
 			await wait()
 
 		digit_place *= 10
+
+	highlight_off()
+	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+
+## バケットソートを実行する。
+func bucket_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+	var values: Array[int] = []
+
+	for i in range(sort_values.size()):
+		values.append(sort_values[i].get_value())
+
+	if values.is_empty():
+		highlight_off()
+		status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+		return
+
+	var min_value: int = values[0]
+	var max_value: int = values[0]
+	for value in values:
+		if value < min_value:
+			min_value = value
+		if value > max_value:
+			max_value = value
+
+	var bucket_count: int = maxi(1, floori(sqrt(float(values.size()))))
+	var value_range: int = (max_value - min_value) + 1
+	var buckets: Array = []
+	buckets.resize(bucket_count)
+	for i in range(bucket_count):
+		buckets[i] = []
+
+	# 値を範囲に応じたバケットへ振り分ける。
+	for i in range(values.size()):
+		var value: int = values[i]
+		var normalized: int = value - min_value
+		var bucket_index: int = mini(bucket_count - 1, floori(float(normalized * bucket_count) / value_range))
+		buckets[bucket_index].append(value)
+		step_count += 1
+		highlight_panel(i)
+		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+		await wait()
+
+	# 各バケット内をソートして順に戻す。
+	var write_index: int = 0
+	for bucket in buckets:
+		bucket.sort()
+		for value in bucket:
+			values[write_index] = value
+			sort_values[write_index].set_value(value)
+			step_count += 1
+			highlight_panel(write_index)
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+			write_index += 1
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
