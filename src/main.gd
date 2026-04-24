@@ -45,6 +45,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Radix Sort", radix_sort),
 	Sorter.new("Bucket Sort", bucket_sort),
 	Sorter.new("Gnome Sort", gnome_sort),
+	Sorter.new("Shaker Sort", shaker_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -654,6 +655,53 @@ func gnome_sort() -> void:
 			sort_values[index].set_value(sort_values[index - 1].get_value())
 			sort_values[index - 1].set_value(temp)
 			index -= 1
+
+	highlight_off()
+	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+
+## シェーカーソートを実行する。
+func shaker_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+	var left: int = 0
+	var right: int = sort_values.size() - 1
+
+	while left < right:
+		var swapped: bool = false
+
+		# 左から右へ走査して大きい値を右端へ送る。
+		for i in range(left, right):
+			step_count += 1
+			highlight_panel(i + 1)
+			if sort_values[i].get_value() > sort_values[i + 1].get_value():
+				var temp: int = sort_values[i].get_value()
+				sort_values[i].set_value(sort_values[i + 1].get_value())
+				sort_values[i + 1].set_value(temp)
+				swapped = true
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+		right -= 1
+
+		if not swapped:
+			break
+
+		swapped = false
+
+		# 右から左へ走査して小さい値を左端へ送る。
+		for i in range(right, left, -1):
+			step_count += 1
+			highlight_panel(i - 1)
+			if sort_values[i - 1].get_value() > sort_values[i].get_value():
+				var temp: int = sort_values[i - 1].get_value()
+				sort_values[i - 1].set_value(sort_values[i].get_value())
+				sort_values[i].set_value(temp)
+				swapped = true
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+		left += 1
+
+		if not swapped:
+			break
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
