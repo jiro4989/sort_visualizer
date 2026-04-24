@@ -217,7 +217,9 @@ func bubble_sort() -> void:
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
 			step_count += 1
-			highlight_panel(j+1, j) # j+1 の位置の Panel だけ背景色を赤にする
+			# j の位置は swap 前の位置、
+			# j+1 の位置は swap 後の位置で、それぞれ別の色としてハイライトする。
+			highlight_panel(j+1, j)
 
 			if sort_values[j].get_value() > sort_values[j + 1].get_value():
 				var temp: int = sort_values[j].get_value()
