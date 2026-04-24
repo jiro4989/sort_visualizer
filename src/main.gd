@@ -223,6 +223,10 @@ func _on_run_sort_button_pressed() -> void:
 	select_element_count_option.disabled = false
 	select_animation_option.disabled = false
 
+# ---------------------------------------
+# ソートアルゴリズムはここから下に実装する。
+# ---------------------------------------
+
 func sort(sort_type: String) -> void:
 	await sort_algorithms_map[sort_type].sort.call()
 
