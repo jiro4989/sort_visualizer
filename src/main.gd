@@ -18,6 +18,7 @@ const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
 const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT * 2 - MARGIN_SIZE * 4
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
+const BAR_SWAP_BEFORE_COLOR: Color = Color(0.25, 1.0, 0.25, 1.0)
 const SOUND_SAMPLE_RATE: float = 44100.0
 const SOUND_BUFFER_LENGTH: float = 0.2
 const SOUND_DURATION_SEC: float = 0.03
@@ -132,9 +133,12 @@ func shuffle_sort_values() -> void:
 ## 指定したインデックスの Panel の背景色を変更する。
 ##
 ## -1 を指定すると全ての Panel の背景色をデフォルトに戻す。
-func highlight_panel(selected_index: int) -> void:
+func highlight_panel(selected_index: int, before_index: int = -1) -> void:
 	for i in range(sort_values.size()):
-		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
+		if before_index >= 0 and i == before_index:
+			sort_values[i].apply_panel_style(BAR_SWAP_BEFORE_COLOR)
+		else:
+			sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 	play_sound(selected_index)
 
 func highlight_off() -> void:
@@ -213,7 +217,7 @@ func bubble_sort() -> void:
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
 			step_count += 1
-			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
+			highlight_panel(j+1, j) # j+1 の位置の Panel だけ背景色を赤にする
 
 			if sort_values[j].get_value() > sort_values[j + 1].get_value():
 				var temp: int = sort_values[j].get_value()
@@ -505,8 +509,8 @@ func counting_sort() -> void:
 	for i in range(temp_values.size()):
 		step_count += 1
 		var value: int = temp_values[i]
-		sort_values[value - 1].set_value(value)
 		highlight_panel(value - 1)
+		sort_values[value - 1].set_value(value)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
