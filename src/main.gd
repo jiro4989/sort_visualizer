@@ -103,6 +103,8 @@ func shuffle_sort_values() -> void:
 		sort_values[i].set_value(values[i])
 
 ## 指定したインデックスの Panel の背景色を変更する。
+##
+## -1 を指定すると全ての Panel の背景色をデフォルトに戻す。
 func highlight_panel(selected_index: int) -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
