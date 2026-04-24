@@ -37,6 +37,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Shell Sort", shell_sort),
 	Sorter.new("Heap Sort", heap_sort),
 	Sorter.new("Quick Sort", quick_sort),
+	Sorter.new("Counting Sort", counting_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -449,3 +450,34 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 		sort_values[high].set_value(temp)
 
 	return store_index
+
+## カウントソートを実行する。
+##
+## 本ツール上のデータは、1～100 の連番で重複がなく、値が sort_values のインデックスに対応している。
+## そのため、sort_values の値がそのまま配列のインデックスに指定することで、値比較をせずにソートできる。
+func counting_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+
+	# sort_values と同じ長さの配列を作成して値をコピーする
+	var temp_values: Array[int] = []
+	temp_values.resize(sort_values.size())
+	for i in range(sort_values.size()):
+		step_count += 1
+		var value: int = sort_values[i].get_value()
+		temp_values[i] = value 
+		highlight_panel(i)
+		status_label.text = create_status_text("Running", start_time, step_count)
+		await get_tree().create_timer(SLEEP_TIME).timeout
+	
+	# コピーした値を sort_value のインデックスに指定して代入する
+	for i in range(temp_values.size()):
+		step_count += 1
+		var value: int = temp_values[i]
+		sort_values[value - 1].set_value(value)
+		highlight_panel(value - 1)
+		status_label.text = create_status_text("Running", start_time, step_count)
+		await get_tree().create_timer(SLEEP_TIME).timeout
+
+	highlight_off()
+	status_label.text = create_status_text("Done", start_time, step_count)
