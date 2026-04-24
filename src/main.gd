@@ -41,7 +41,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Shell Sort", shell_sort),
 	Sorter.new("Heap Sort", heap_sort),
 	Sorter.new("Quick Sort", quick_sort),
-	Sorter.new("Counting Sort", counting_sort),
+	Sorter.new("Pigeonhole Sort", pigeonhole_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -482,11 +482,11 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 
 	return store_index
 
-## カウントソートを実行する。
+## 鳩の巣ソートを実行する。
 ##
 ## 本ツール上のデータは、連番で重複がなく、値が sort_values のインデックスに対応している。
 ## そのため、sort_values の値がそのまま配列のインデックスに指定することで、値比較をせずにソートできる。
-func counting_sort() -> void:
+func pigeonhole_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
 	var step_count: int = 0
 
