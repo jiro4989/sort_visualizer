@@ -27,10 +27,32 @@ var sound_stream: AudioStreamGenerator
 var sound_playback: AudioStreamGeneratorPlayback
 var sound_phase: float = 0.0
 
+# ソートアルゴリズムを追加するたびに tscn ファイルを編集するのが面倒なので
+# Option 要素はコードですべて定義して、初期化時に Item を追加する。
+var sort_algorithms: Array[Sorter] = [
+	Sorter.new("Bubble Sort", bubble_sort),
+	Sorter.new("Merge Sort", merge_sort),
+	Sorter.new("Insertion Sort", insertion_sort),
+	Sorter.new("Selection Sort", selection_sort),
+	Sorter.new("Shell Sort", shell_sort),
+	Sorter.new("Heap Sort", heap_sort),
+	Sorter.new("Quick Sort", quick_sort),
+]
+
+# 配列のループで要素を取り出すのは基本的に遅いので
+# 辞書に詰め直してキーでアクセスできるようにしておく。
+var sort_algorithms_map: Dictionary[String, Sorter] = {}
+
 func _ready() -> void:
 	setup_sound_stream()
+	setup_sort_algorithm()
 	setup_sort_values()
 	shuffle_sort_values()
+
+func setup_sort_algorithm() -> void:
+	for sorter in sort_algorithms:
+		sort_algorithms_map[sorter.name] = sorter
+		select_sort_option.add_item(sorter.name)
 
 ## ソート対象の値を初期化する。
 func setup_sort_values() -> void:
@@ -150,21 +172,7 @@ func _on_run_sort_button_pressed() -> void:
 	select_element_count_option.disabled = false
 
 func sort(sort_type: String) -> void:
-	match sort_type:
-		"Bubble Sort":
-			await bubble_sort()
-		"Merge Sort":
-			await merge_sort()
-		"Insertion Sort":
-			await insertion_sort()
-		"Selection Sort":
-			await selection_sort()
-		"Shell Sort":
-			await shell_sort()
-		"Heap Sort":
-			await heap_sort()
-		"Quick Sort":
-			await quick_sort()
+	await sort_algorithms_map[sort_type].sort.call()
 
 ## バブルソートを実行する。
 func bubble_sort() -> void:
