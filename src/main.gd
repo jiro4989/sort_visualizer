@@ -149,7 +149,7 @@ func highlight_off() -> void:
 
 ## 先頭から順にハイライトして、最後に全てのパネルをデフォルトに戻す。
 ## 主にソート完了後の強調目的で使用する。
-func highlight_all_panels() -> void:
+func highlight_all_bars() -> void:
 	for i in range(sort_values.size()):
 		highlight_bar(i)
 		# このハイライトはソート完了後の強調表示に過ぎないため、
@@ -174,7 +174,7 @@ func _on_run_sort_button_pressed() -> void:
 	select_animation_option.disabled = true
 
 	await sort(select_sort_option.text)
-	await highlight_all_panels()
+	await highlight_all_bars()
 
 	shuffle_button.disabled = false
 	run_sort_button.disabled = false
