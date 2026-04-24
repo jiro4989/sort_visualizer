@@ -19,18 +19,12 @@ const VISUALIZATION_AREA_WIDTH: int = 1600 - MARGIN_SIZE * 2
 const VISUALIZATION_AREA_HEIGHT: int = 900 - BUTTON_HEIGHT * 2 - MARGIN_SIZE * 4
 const BAR_DEFAULT_COLOR: Color = Color(0.25, 0.6, 0.95, 1.0)
 const BAR_SELECTED_COLOR: Color = Color(1.0, 0.25, 0.25, 1.0)
-const SOUND_SAMPLE_RATE: float = 44100.0
-const SOUND_BUFFER_LENGTH: float = 0.2
-const SOUND_DURATION_SEC: float = 0.03
-const SOUND_VOLUME: float = 0.12
 
 const MESSAGE_RUNNING: String = "Running"
 const MESSAGE_DONE: String = "Done"
 
 var sort_values: Array[SortBar] = []
-var sound_stream: AudioStreamGenerator
-var sound_playback: AudioStreamGeneratorPlayback
-var sound_phase: float = 0.0
+var sound_controller: SoundController = SoundController.new()
 
 # ソートアルゴリズムを追加するたびに tscn ファイルを編集するのが面倒なので
 # Option 要素はコードですべて定義して、初期化時に Item を追加する。
@@ -56,7 +50,7 @@ var sort_algorithms_map: Dictionary[String, Sorter] = {}
 
 func _ready() -> void:
 	setup_visualization_layout()
-	setup_sound_stream()
+	sound_controller.setup(audio_stream_player)
 	setup_sort_algorithm()
 	setup_sort_values()
 	shuffle_sort_values()
@@ -107,14 +101,6 @@ func wait() -> void:
 func wait_seconds(seconds: float) -> void:
 	await get_tree().create_timer(seconds).timeout
 
-func setup_sound_stream() -> void:
-	sound_stream = AudioStreamGenerator.new()
-	sound_stream.mix_rate = SOUND_SAMPLE_RATE
-	sound_stream.buffer_length = SOUND_BUFFER_LENGTH
-	audio_stream_player.stream = sound_stream
-	audio_stream_player.play()
-	sound_playback = audio_stream_player.get_stream_playback() as AudioStreamGeneratorPlayback
-
 func _on_shuffle_button_pressed() -> void:
 	shuffle_sort_values()
 
@@ -151,7 +137,12 @@ func shuffle_sort_values() -> void:
 func highlight_panel(selected_index: int) -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
-	play_sound(selected_index)
+	sound_controller.play_sound(
+		selected_index,
+		sort_values,
+		get_selected_element_count(),
+		get_selected_volume_scale()
+	)
 
 func highlight_off() -> void:
 	highlight_panel(-1)
@@ -175,39 +166,6 @@ func get_selected_volume_scale() -> float:
 	var volume_text: String = select_volume_option.text
 	var volume_percent: float = clampf(volume_text.to_float(), 0.0, 100.0)
 	return volume_percent / 100.0
-
-## 指定したインデックスの値に応じたサイン波を鳴らす。
-func play_sound(selected_index: int) -> void:
-	if selected_index < 0 or selected_index >= sort_values.size():
-		return
-	if sound_playback == null:
-		setup_sound_stream()
-		if sound_playback == null:
-			return
-
-	var v: int = sort_values[selected_index].get_value()
-
-	var min_hz: float = 220.0
-	var max_hz: float = 880.0
-	var t: float = float(v - 1) / float(max(1, get_selected_element_count() - 1))
-	var frequency: float = lerpf(min_hz, max_hz, t)
-	var frame_count: int = int(SOUND_SAMPLE_RATE * SOUND_DURATION_SEC)
-	var fade_frames: int = int(frame_count * 0.2)
-	if sound_playback.get_frames_available() < frame_count:
-		return
-
-	for i in range(frame_count):
-		var envelope: float = 1.0
-		if fade_frames > 0 and i < fade_frames:
-			envelope = float(i) / float(fade_frames)
-		elif fade_frames > 0 and i >= frame_count - fade_frames:
-			envelope = float(frame_count - i - 1) / float(fade_frames)
-
-		var sample: float = sin(sound_phase) * SOUND_VOLUME * get_selected_volume_scale() * max(envelope, 0.0)
-		sound_playback.push_frame(Vector2(sample, sample))
-		sound_phase += TAU * frequency / SOUND_SAMPLE_RATE
-		if sound_phase >= TAU:
-			sound_phase = fmod(sound_phase, TAU)
 
 func _on_run_sort_button_pressed() -> void:
 	shuffle_button.disabled = true
