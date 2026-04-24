@@ -145,9 +145,9 @@ func shuffle_sort_values() -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].set_value(values[i])
 
-## 指定したインデックスの Panel の背景色を変更する。
+## 指定したインデックスのバーの背景色を変更する。
 ##
-## -1 を指定すると全ての Panel の背景色をデフォルトに戻す。
+## -1 を指定すると全てのバーの背景色をデフォルトに戻す。
 func highlight_bar(selected_index: int) -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
@@ -158,10 +158,11 @@ func highlight_bar(selected_index: int) -> void:
 		get_selected_volume_scale()
 	)
 
+## 全てのバーの背景色をデフォルトに戻す。
 func highlight_off() -> void:
 	highlight_bar(-1)
 
-## 先頭から順にハイライトして、最後に全てのパネルをデフォルトに戻す。
+## 先頭から順にハイライトして、最後に全てのバーの背景色をデフォルトに戻す。
 ## 主にソート完了後の強調目的で使用する。
 func highlight_all_bars() -> void:
 	for i in range(sort_values.size()):
@@ -176,6 +177,8 @@ func create_status_text(text: String, start_time: float, step_count: int) -> Str
 	var elapsed_seconds: float = (Time.get_ticks_msec() - start_time) / 1000.0
 	return "%s: %.1fs, %d step" % [text, elapsed_seconds, step_count]
 
+## 音量スケールを取得する。
+## 音量は UI 上で百分率で設定しているため、小数に変換してから返却する。
 func get_selected_volume_scale() -> float:
 	var volume_text: String = select_volume_option.text
 	var volume_percent: float = clampf(volume_text.to_float(), 0.0, 100.0)
@@ -195,10 +198,14 @@ func _on_run_sort_button_pressed() -> void:
 	select_element_count_option.disabled = false
 	select_animation_option.disabled = false
 
+## ソート処理中の各ステップで呼び出す関数。
+## バーのハイライトとテキストの更新を行う。
 func _on_step(selected_index: int, start_time: float, step_count: int) -> void:
 	highlight_bar(selected_index)
 	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 
+## ソート処理が完了したときに呼び出す関数。
+## バーのハイライトを解除し、テキストを更新する。
 func _on_done(start_time: float, step_count: int) -> void:
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
