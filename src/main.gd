@@ -44,6 +44,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Pigeonhole Sort", pigeonhole_sort),
 	Sorter.new("Radix Sort", radix_sort),
 	Sorter.new("Bucket Sort", bucket_sort),
+	Sorter.new("Gnome Sort", gnome_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -630,6 +631,29 @@ func bucket_sort() -> void:
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 			write_index += 1
+
+	highlight_off()
+	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+
+## ノームソートを実行する。
+func gnome_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+	var index: int = 1
+
+	while index < sort_values.size():
+		step_count += 1
+		highlight_panel(index)
+		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+		await wait()
+
+		if index == 0 or sort_values[index - 1].get_value() <= sort_values[index].get_value():
+			index += 1
+		else:
+			var temp: int = sort_values[index].get_value()
+			sort_values[index].set_value(sort_values[index - 1].get_value())
+			sort_values[index - 1].set_value(temp)
+			index -= 1
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
