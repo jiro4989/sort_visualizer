@@ -459,7 +459,7 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 
 ## カウントソートを実行する。
 ##
-## 本ツール上のデータは、1～100 の連番で重複がなく、値が sort_values のインデックスに対応している。
+## 本ツール上のデータは、連番で重複がなく、値が sort_values のインデックスに対応している。
 ## そのため、sort_values の値がそのまま配列のインデックスに指定することで、値比較をせずにソートできる。
 func counting_sort() -> void:
 	var start_time: float = Time.get_ticks_msec()
