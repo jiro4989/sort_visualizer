@@ -25,11 +25,12 @@ const MESSAGE_DONE: String = "Done"
 
 var sort_values: Array[SortBar] = []
 var sound_controller: SoundController
+var bubble_sort: BubbleSort = BubbleSort.new(sort_values, _on_step, _on_done, wait)
 
 # ソートアルゴリズムを追加するたびに tscn ファイルを編集するのが面倒なので
 # Option 要素はコードですべて定義して、初期化時に Item を追加する。
 var sort_algorithms: Array[Sorter] = [
-	Sorter.new("Bubble Sort", bubble_sort),
+	Sorter.new("Bubble Sort", bubble_sort.sort),
 	Sorter.new("Merge Sort", merge_sort),
 	Sorter.new("Insertion Sort", insertion_sort),
 	Sorter.new("Selection Sort", selection_sort),
@@ -188,23 +189,11 @@ func _on_run_sort_button_pressed() -> void:
 func sort(sort_type: String) -> void:
 	await sort_algorithms_map[sort_type].sort.call()
 
-## バブルソートを実行する。
-func bubble_sort() -> void:
-	var start_time: float = Time.get_ticks_msec()
-	var step_count: int = 0
-	for i in sort_values.size() - 1:
-		for j in range(0, sort_values.size() - i - 1):
-			step_count += 1
-			highlight_bar(j+1) # j+1 の位置の Panel だけ背景色を赤にする
+func _on_step(selected_index: int, start_time: float, step_count: int) -> void:
+	highlight_bar(selected_index)
+	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 
-			if sort_values[j].get_value() > sort_values[j + 1].get_value():
-				var temp: int = sort_values[j].get_value()
-				sort_values[j].set_value(sort_values[j + 1].get_value())
-				sort_values[j + 1].set_value(temp)
-
-			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
-			await wait()
-
+func _on_done(start_time: float, step_count: int) -> void:
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
 
