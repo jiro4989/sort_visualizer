@@ -46,6 +46,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Bucket Sort", bucket_sort),
 	Sorter.new("Gnome Sort", gnome_sort),
 	Sorter.new("Shaker Sort", shaker_sort),
+	Sorter.new("Comb Sort", comb_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -702,6 +703,35 @@ func shaker_sort() -> void:
 
 		if not swapped:
 			break
+
+	highlight_off()
+	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+
+## コムソートを実行する。
+func comb_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+	var gap: int = sort_values.size()
+	var shrink: float = 1.3
+	var swapped: bool = true
+
+	while gap > 1 or swapped:
+		gap = floori(float(gap) / shrink)
+		if gap < 1:
+			gap = 1
+
+		swapped = false
+		for i in range(0, sort_values.size() - gap):
+			var j: int = i + gap
+			step_count += 1
+			highlight_panel(j)
+			if sort_values[i].get_value() > sort_values[j].get_value():
+				var temp: int = sort_values[i].get_value()
+				sort_values[i].set_value(sort_values[j].get_value())
+				sort_values[j].set_value(temp)
+				swapped = true
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
