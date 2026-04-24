@@ -134,7 +134,7 @@ func shuffle_sort_values() -> void:
 ## 指定したインデックスの Panel の背景色を変更する。
 ##
 ## -1 を指定すると全ての Panel の背景色をデフォルトに戻す。
-func highlight_panel(selected_index: int) -> void:
+func highlight_bar(selected_index: int) -> void:
 	for i in range(sort_values.size()):
 		sort_values[i].apply_panel_style(BAR_SELECTED_COLOR if i == selected_index else BAR_DEFAULT_COLOR)
 	sound_controller.play_sound(
@@ -145,13 +145,13 @@ func highlight_panel(selected_index: int) -> void:
 	)
 
 func highlight_off() -> void:
-	highlight_panel(-1)
+	highlight_bar(-1)
 
 ## 先頭から順にハイライトして、最後に全てのパネルをデフォルトに戻す。
 ## 主にソート完了後の強調目的で使用する。
 func highlight_all_panels() -> void:
 	for i in range(sort_values.size()):
-		highlight_panel(i)
+		highlight_bar(i)
 		# このハイライトはソート完了後の強調表示に過ぎないため、
 		# さっさと処理を終わらせた方が体験が良いと思うので、待機時間を固定で小さい値とする。
 		await wait_seconds(0.01)
@@ -195,7 +195,7 @@ func bubble_sort() -> void:
 	for i in sort_values.size() - 1:
 		for j in range(0, sort_values.size() - i - 1):
 			step_count += 1
-			highlight_panel(j+1) # j+1 の位置の Panel だけ背景色を赤にする
+			highlight_bar(j+1) # j+1 の位置の Panel だけ背景色を赤にする
 
 			if sort_values[j].get_value() > sort_values[j + 1].get_value():
 				var temp: int = sort_values[j].get_value()
@@ -270,7 +270,7 @@ func _merge(values: Array[int], left: int, mid: int, right: int, start_time: flo
 func _apply_merge_step(values: Array[int], index: int, start_time: float, loop_count_box: Array[int]) -> void:
 	sort_values[index].set_value(values[index])
 	loop_count_box[0] += 1
-	highlight_panel(index)
+	highlight_bar(index)
 	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 	await wait()
 
@@ -286,7 +286,7 @@ func insertion_sort() -> void:
 		# key より大きい要素を右へずらす
 		while j >= 0 and sort_values[j].get_value() > key:
 			step_count += 1
-			highlight_panel(j)
+			highlight_bar(j)
 			sort_values[j + 1].set_value(sort_values[j].get_value())
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
@@ -294,7 +294,7 @@ func insertion_sort() -> void:
 
 		sort_values[j + 1].set_value(key)
 		step_count += 1
-		highlight_panel(j + 1)
+		highlight_bar(j + 1)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
@@ -310,7 +310,7 @@ func selection_sort() -> void:
 		var min_index: int = i
 		for j in range(i + 1, sort_values.size()):
 			step_count += 1
-			highlight_panel(j)
+			highlight_bar(j)
 			if sort_values[j].get_value() < sort_values[min_index].get_value():
 				min_index = j
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
@@ -322,7 +322,7 @@ func selection_sort() -> void:
 			sort_values[min_index].set_value(temp)
 
 		step_count += 1
-		highlight_panel(i)
+		highlight_bar(i)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
@@ -342,7 +342,7 @@ func shell_sort() -> void:
 
 			while j >= gap and sort_values[j - gap].get_value() > temp:
 				step_count += 1
-				highlight_panel(j)
+				highlight_bar(j)
 				sort_values[j].set_value(sort_values[j - gap].get_value())
 				status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 				await wait()
@@ -350,7 +350,7 @@ func shell_sort() -> void:
 
 			sort_values[j].set_value(temp)
 			step_count += 1
-			highlight_panel(j)
+			highlight_bar(j)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 
@@ -374,7 +374,7 @@ func heap_sort() -> void:
 		sort_values[end_index].set_value(temp)
 
 		loop_count_box[0] += 1
-		highlight_panel(end_index)
+		highlight_bar(end_index)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 		await wait()
 
@@ -390,7 +390,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 
 	if left < heap_size:
 		loop_count_box[0] += 1
-		highlight_panel(left)
+		highlight_bar(left)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 		await wait()
 		if sort_values[left].get_value() > sort_values[largest].get_value():
@@ -398,7 +398,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 
 	if right < heap_size:
 		loop_count_box[0] += 1
-		highlight_panel(right)
+		highlight_bar(right)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 		await wait()
 		if sort_values[right].get_value() > sort_values[largest].get_value():
@@ -410,7 +410,7 @@ func _heapify(heap_size: int, root_index: int, start_time: float, loop_count_box
 		sort_values[largest].set_value(temp)
 
 		loop_count_box[0] += 1
-		highlight_panel(largest)
+		highlight_bar(largest)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 		await wait()
 
@@ -441,7 +441,7 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 
 	for scan_index in range(low, high):
 		loop_count_box[0] += 1
-		highlight_panel(scan_index)
+		highlight_bar(scan_index)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 		await wait()
 
@@ -453,7 +453,7 @@ func _partition(low: int, high: int, start_time: float, loop_count_box: Array[in
 			store_index += 1
 
 	loop_count_box[0] += 1
-	highlight_panel(store_index)
+	highlight_bar(store_index)
 	status_label.text = create_status_text(MESSAGE_RUNNING, start_time, loop_count_box[0])
 	await wait()
 
@@ -479,7 +479,7 @@ func pigeonhole_sort() -> void:
 		step_count += 1
 		var value: int = sort_values[i].get_value()
 		temp_values[i] = value 
-		highlight_panel(i)
+		highlight_bar(i)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 	
@@ -488,7 +488,7 @@ func pigeonhole_sort() -> void:
 		step_count += 1
 		var value: int = temp_values[i]
 		sort_values[value - 1].set_value(value)
-		highlight_panel(value - 1)
+		highlight_bar(value - 1)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
@@ -524,7 +524,7 @@ func radix_sort() -> void:
 			var digit: int = floori(float(values[i]) / digit_place) % 10
 			count[digit] += 1
 			step_count += 1
-			highlight_panel(i)
+			highlight_bar(i)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 
@@ -540,7 +540,7 @@ func radix_sort() -> void:
 			var output_index: int = count[digit]
 			output[output_index] = value
 			step_count += 1
-			highlight_panel(output_index)
+			highlight_bar(output_index)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 
@@ -549,7 +549,7 @@ func radix_sort() -> void:
 			values[i] = output[i]
 			sort_values[i].set_value(values[i])
 			step_count += 1
-			highlight_panel(i)
+			highlight_bar(i)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 
@@ -594,7 +594,7 @@ func bucket_sort() -> void:
 		var bucket_index: int = mini(bucket_count - 1, floori(float(normalized * bucket_count) / value_range))
 		buckets[bucket_index].append(value)
 		step_count += 1
-		highlight_panel(i)
+		highlight_bar(i)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
@@ -606,7 +606,7 @@ func bucket_sort() -> void:
 			values[write_index] = value
 			sort_values[write_index].set_value(value)
 			step_count += 1
-			highlight_panel(write_index)
+			highlight_bar(write_index)
 			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 			await wait()
 			write_index += 1
@@ -622,7 +622,7 @@ func gnome_sort() -> void:
 
 	while index < sort_values.size():
 		step_count += 1
-		highlight_panel(index)
+		highlight_bar(index)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
 
@@ -650,7 +650,7 @@ func shaker_sort() -> void:
 		# 左から右へ走査して大きい値を右端へ送る。
 		for i in range(left, right):
 			step_count += 1
-			highlight_panel(i + 1)
+			highlight_bar(i + 1)
 			if sort_values[i].get_value() > sort_values[i + 1].get_value():
 				var temp: int = sort_values[i].get_value()
 				sort_values[i].set_value(sort_values[i + 1].get_value())
@@ -668,7 +668,7 @@ func shaker_sort() -> void:
 		# 右から左へ走査して小さい値を左端へ送る。
 		for i in range(right, left, -1):
 			step_count += 1
-			highlight_panel(i - 1)
+			highlight_bar(i - 1)
 			if sort_values[i - 1].get_value() > sort_values[i].get_value():
 				var temp: int = sort_values[i - 1].get_value()
 				sort_values[i - 1].set_value(sort_values[i].get_value())
@@ -701,7 +701,7 @@ func comb_sort() -> void:
 		for i in range(0, sort_values.size() - gap):
 			var j: int = i + gap
 			step_count += 1
-			highlight_panel(j)
+			highlight_bar(j)
 			if sort_values[i].get_value() > sort_values[j].get_value():
 				var temp: int = sort_values[i].get_value()
 				sort_values[i].set_value(sort_values[j].get_value())
