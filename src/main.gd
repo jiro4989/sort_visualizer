@@ -42,6 +42,7 @@ var sort_algorithms: Array[Sorter] = [
 	Sorter.new("Heap Sort", heap_sort),
 	Sorter.new("Quick Sort", quick_sort),
 	Sorter.new("Pigeonhole Sort", pigeonhole_sort),
+	Sorter.new("Radix Sort", radix_sort),
 ]
 
 # 配列のループで要素を取り出すのは基本的に遅いので
@@ -509,6 +510,69 @@ func pigeonhole_sort() -> void:
 		highlight_panel(value - 1)
 		status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
 		await wait()
+
+	highlight_off()
+	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
+
+## 基数ソートを実行する。
+func radix_sort() -> void:
+	var start_time: float = Time.get_ticks_msec()
+	var step_count: int = 0
+	var values: Array[int] = []
+
+	for i in range(sort_values.size()):
+		values.append(sort_values[i].get_value())
+
+	var max_value: int = 0
+	for value in values:
+		if value > max_value:
+			max_value = value
+
+	var digit_place: int = 1
+	while floori(float(max_value) / digit_place) > 0:
+		var count: Array[int] = []
+		count.resize(10)
+		for i in range(10):
+			count[i] = 0
+
+		var output: Array[int] = []
+		output.resize(values.size())
+
+		# 現在の桁の出現数を数える
+		for i in range(values.size()):
+			var digit: int = floori(float(values[i]) / digit_place) % 10
+			count[digit] += 1
+			step_count += 1
+			highlight_panel(i)
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+
+		# 累積和に変換して配置先インデックスを求める
+		for i in range(1, 10):
+			count[i] += count[i - 1]
+
+		# 後ろから走査して安定に並べ替える
+		for i in range(values.size() - 1, -1, -1):
+			var value: int = values[i]
+			var digit: int = floori(float(value) / digit_place) % 10
+			count[digit] -= 1
+			var output_index: int = count[digit]
+			output[output_index] = value
+			step_count += 1
+			highlight_panel(output_index)
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+
+		# 可視化用のバーに反映する
+		for i in range(values.size()):
+			values[i] = output[i]
+			sort_values[i].set_value(values[i])
+			step_count += 1
+			highlight_panel(i)
+			status_label.text = create_status_text(MESSAGE_RUNNING, start_time, step_count)
+			await wait()
+
+		digit_place *= 10
 
 	highlight_off()
 	status_label.text = create_status_text(MESSAGE_DONE, start_time, step_count)
