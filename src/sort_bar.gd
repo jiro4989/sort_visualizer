@@ -3,6 +3,7 @@ class_name SortBar
 var value: int
 var column: VBoxContainer
 var panel: Panel
+var panel_style: StyleBoxFlat
 var bar_width: float
 var bar_height: float
 
@@ -23,20 +24,25 @@ func _init(_value: int, _bar_width: float, _bar_height: float, color: Color) -> 
 	panel = Panel.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
+	panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = color
+	# panel の角を丸めない
+	panel_style.corner_radius_top_left = 0
+	panel_style.corner_radius_top_right = 0
+	panel_style.corner_radius_bottom_right = 0
+	panel_style.corner_radius_bottom_left = 0
+	panel.add_theme_stylebox_override("panel", panel_style)
+
 	set_value(value)
 	apply_panel_style(color)
 	column.add_child(panel)
 
 ## Panel の背景色を変更する。
 func apply_panel_style(color: Color) -> void:
-	var style_box := StyleBoxFlat.new()
-	style_box.bg_color = color
-	# panel の角を丸めない
-	style_box.corner_radius_top_left = 0
-	style_box.corner_radius_top_right = 0
-	style_box.corner_radius_bottom_right = 0
-	style_box.corner_radius_bottom_left = 0
-	panel.add_theme_stylebox_override("panel", style_box)
+	if panel_style.bg_color == color:
+		return
+	panel_style.bg_color = color
+	panel.queue_redraw()
 
 func get_value() -> int:
 	return value

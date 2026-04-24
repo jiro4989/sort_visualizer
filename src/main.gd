@@ -49,10 +49,20 @@ var sort_algorithms: Array[Sorter] = [
 var sort_algorithms_map: Dictionary[String, Sorter] = {}
 
 func _ready() -> void:
+	setup_visualization_layout()
 	setup_sound_stream()
 	setup_sort_algorithm()
 	setup_sort_values()
 	shuffle_sort_values()
+
+## ソート中に上段 UI の高さやスタイル差し替えで可視化エリアの割当高さが揺れないようにする。
+func setup_visualization_layout() -> void:
+	sort_visualization_area.custom_minimum_size.y = VISUALIZATION_AREA_HEIGHT
+	sort_visualization_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	status_label.clip_text = true
+	status_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 func setup_sort_algorithm() -> void:
 	for sorter in sort_algorithms:
